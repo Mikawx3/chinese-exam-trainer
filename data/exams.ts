@@ -28,6 +28,7 @@ export interface Exam {
       sentences: Array<{
         id: string
         sentence: string
+        pinyin?: string
         blanks: Array<{ position: number; correctAnswer: string }>
       }>
       wordBank: Array<{ id: string; word: string; pinyin: string }>
