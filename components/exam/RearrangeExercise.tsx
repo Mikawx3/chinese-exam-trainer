@@ -29,10 +29,27 @@ export default function RearrangeExercise({ questions, onComplete, onPrevious, o
   }
 
   const getExplanation = (q: { correctSentence: string; correctPinyin: string }, userOrder: number[], isCorrect: boolean): string => {
-    if (isCorrect) {
-      return `Correct ! L'ordre des mots "${q.correctSentence}" (${q.correctPinyin}) respecte la structure grammaticale chinoise : sujet + verbe + complément.`
+    // Analyser la structure de la phrase correcte
+    const sentence = q.correctSentence
+    let structure = ''
+    
+    if (sentence.includes('在')) {
+      structure = 'La phrase contient "在" (zài) qui indique le lieu. Structure: Sujet + 在 + Lieu + Verbe. Exemple: 我在图书馆学习 (Je suis à la bibliothèque pour étudier).'
+    } else if (sentence.includes('跟') || sentence.includes('和')) {
+      structure = 'La phrase contient "跟/和" (gēn/hé = avec) pour exprimer la compagnie. Structure: Sujet1 + 跟/和 + Sujet2 + Verbe. Exemple: 我跟朋友见面 (Je rencontre des amis).'
+    } else if (sentence.includes('想') || sentence.includes('要')) {
+      structure = 'La phrase contient "想/要" (xiǎng/yào = vouloir) pour exprimer une intention. Structure: Sujet + 想/要 + Verbe + Objet. Exemple: 我想去公园 (Je veux aller au parc).'
+    } else if (sentence.includes('有')) {
+      structure = 'La phrase contient "有" (yǒu = avoir/exister) pour exprimer la possession ou l\'existence. Structure: Lieu + 有 + Objet ou Sujet + 有 + Objet. Exemple: 食堂前面有一个超市 (Il y a un supermarché devant la cantine).'
+    } else {
+      structure = 'Structure de base SVO (Sujet-Verbe-Objet) : Le sujet vient en premier, suivi du verbe, puis du complément d\'objet. Les compléments de lieu et de temps se placent généralement avant le verbe.'
     }
-    return `L'ordre correct est "${q.correctSentence}" (${q.correctPinyin}). En chinois, l'ordre des mots suit généralement la structure : sujet + verbe + complément.`
+    
+    if (isCorrect) {
+      return `Correct ! L'ordre des mots "${q.correctSentence}" (${q.correctPinyin}) respecte la structure grammaticale chinoise. ${structure} En chinois, l'ordre des mots est fixe et détermine le sens de la phrase.`
+    }
+    
+    return `L'ordre correct est "${q.correctSentence}" (${q.correctPinyin}). ${structure} En chinois, l'ordre des mots suit des règles strictes : Sujet + (Temps) + (Lieu) + Verbe + Objet. Changer l'ordre change le sens ou rend la phrase incorrecte.`
   }
 
   const handleWordClick = (questionId: string, wordIndex: number) => {
@@ -140,12 +157,24 @@ export default function RearrangeExercise({ questions, onComplete, onPrevious, o
               fontSize: '1.2em'
             }}>
               {userOrder.length > 0 ? (
-                userOrder.map((idx, i) => (
-                  <span key={i}>
-                    <span className="chinese-text" style={{ fontSize: '1.2em' }}>{q.words[idx].word}</span>
-                    {i < userOrder.length - 1 && ' '}
-                  </span>
-                ))
+                <div>
+                  <div style={{ marginBottom: '5px' }}>
+                    {userOrder.map((idx, i) => (
+                      <span key={i}>
+                        <span className="chinese-text" style={{ fontSize: '1.2em' }}>{q.words[idx].word}</span>
+                        {i < userOrder.length - 1 && ' '}
+                      </span>
+                    ))}
+                  </div>
+                  <div style={{ color: '#666', fontSize: '0.9em' }}>
+                    {userOrder.map((idx, i) => (
+                      <span key={i}>
+                        {q.words[idx].pinyin}
+                        {i < userOrder.length - 1 && ' '}
+                      </span>
+                    ))}
+                  </div>
+                </div>
               ) : (
                 <span style={{ color: '#999' }}>Cliquez sur les mots dans l'ordre pour former la phrase</span>
               )}

@@ -33,10 +33,33 @@ export default function DialogueExercise({ dialogues, onComplete }: DialogueExer
   }
 
   const getExplanation = (part: { correctAnswer?: string; correctPinyin?: string }, userAnswer: string, isCorrect: boolean): string => {
-    if (isCorrect && part.correctAnswer) {
-      return `Correct ! Dans ce contexte de dialogue, "${part.correctAnswer}" (${part.correctPinyin || ''}) est la réponse appropriée qui s'enchaîne naturellement avec les répliques précédentes.`
+    if (!part.correctAnswer) return ''
+    
+    // Analyser le type de réponse selon les structures courantes
+    let grammarRule = ''
+    if (part.correctAnswer.includes('什么')) {
+      grammarRule = 'La réponse contient "什么" (shénme = quoi), ce qui indique qu\'il s\'agit d\'une question sur un objet ou une chose. En chinois, les questions avec "什么" nécessitent une réponse qui identifie l\'objet demandé.'
+    } else if (part.correctAnswer.includes('谁')) {
+      grammarRule = 'La réponse contient "谁" (shéi = qui), ce qui indique qu\'il s\'agit d\'une question sur une personne. La réponse doit identifier la personne concernée.'
+    } else if (part.correctAnswer.includes('哪里') || part.correctAnswer.includes('哪儿')) {
+      grammarRule = 'La réponse contient "哪里/哪儿" (nǎlǐ/nǎr = où), ce qui indique qu\'il s\'agit d\'une question sur un lieu. La réponse doit indiquer un endroit.'
+    } else if (part.correctAnswer.includes('几点') || part.correctAnswer.includes('什么时候')) {
+      grammarRule = 'La réponse concerne le temps. "几点" (jǐ diǎn) demande une heure précise, "什么时候" (shénme shíhòu) demande un moment. La réponse doit fournir une information temporelle.'
+    } else if (part.correctAnswer.includes('吗') || part.correctAnswer.includes('？')) {
+      grammarRule = 'Il s\'agit d\'une question. En chinois, les questions se forment soit avec "吗" (ma) en fin de phrase, soit avec des mots interrogatifs (什么, 谁, 哪里, etc.). La réponse doit correspondre au type de question posée.'
+    } else if (part.correctAnswer.includes('有')) {
+      grammarRule = 'La réponse contient "有" (yǒu = avoir/exister). Dans un dialogue, "有" peut exprimer la possession, l\'existence, ou être utilisé dans des structures comme "有没有" (avoir ou non). La réponse doit être cohérente avec le contexte.'
+    } else if (part.correctAnswer.includes('是')) {
+      grammarRule = 'La réponse contient "是" (shì = être). "是" est utilisé pour les phrases d\'identification et d\'attribution. La structure est: Sujet + 是 + Attribut.'
+    } else {
+      grammarRule = 'En chinois, les dialogues suivent des règles de cohérence discursive : chaque réplique doit répondre logiquement à la précédente. Les questions nécessitent des réponses appropriées, et les déclarations peuvent être suivies d\'accords, de désaccords, ou de questions de suivi.'
     }
-    return `La réponse correcte est "${part.correctAnswer || ''}" (${part.correctPinyin || ''}) car elle s'intègre logiquement dans le contexte du dialogue et répond de manière appropriée à la question ou à la déclaration précédente.`
+    
+    if (isCorrect) {
+      return `Correct ! Dans ce contexte de dialogue, "${part.correctAnswer}" (${part.correctPinyin || ''}) est la réponse appropriée. ${grammarRule} Cette réponse respecte les règles de cohérence conversationnelle en chinois et s'enchaîne naturellement avec les répliques précédentes.`
+    }
+    
+    return `La réponse correcte est "${part.correctAnswer}" (${part.correctPinyin || ''}). ${grammarRule} En chinois, les dialogues suivent des règles de cohérence : chaque réplique doit répondre logiquement à la précédente selon le type de question ou de déclaration. La réponse doit respecter la structure grammaticale et la logique conversationnelle.`
   }
 
   const handleAnswerChange = (blankId: string, value: string) => {
@@ -131,10 +154,12 @@ export default function DialogueExercise({ dialogues, onComplete }: DialogueExer
                 return (
                   <div key={index} style={{ marginBottom: '10px' }}>
                     <strong>{part.speaker}:</strong>{' '}
-                    <span className="chinese-text">{part.text}</span>
-                    {part.pinyin && (
-                      <span style={{ marginLeft: '10px', color: '#666' }}>({part.pinyin})</span>
-                    )}
+                    <div style={{ display: 'inline-block' }}>
+                      <span className="chinese-text">{part.text}</span>
+                      {part.pinyin && (
+                        <div style={{ color: '#666', marginTop: '5px' }}>{part.pinyin}</div>
+                      )}
+                    </div>
                   </div>
                 )
               }

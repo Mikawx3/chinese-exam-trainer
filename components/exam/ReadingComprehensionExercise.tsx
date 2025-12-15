@@ -33,10 +33,38 @@ export default function ReadingComprehensionExercise({ passage, questions, onCom
   }
 
   const getExplanation = (q: { question: string; correctAnswer: string; correctPinyin?: string }, userAnswer: string, isCorrect: boolean): string => {
-    if (isCorrect) {
-      return `Correct ! La réponse "${q.correctAnswer}" ${q.correctPinyin ? `(${q.correctPinyin})` : ''} est directement mentionnée ou peut être déduite du texte.`
+    // Analyser le type de question
+    let questionType = ''
+    let strategy = ''
+    
+    if (q.question.includes('谁') || q.question.includes('谁')) {
+      questionType = 'question sur une personne (谁 = qui)'
+      strategy = 'Cherchez dans le texte les noms de personnes mentionnés. La réponse est généralement un nom propre ou un terme désignant une personne (朋友, 学生, etc.).'
+    } else if (q.question.includes('什么') || q.question.includes('哪')) {
+      questionType = 'question sur un objet, chose ou choix (什么/哪 = quoi/quel)'
+      strategy = 'Identifiez les mots-clés dans la question et cherchez-les dans le texte. La réponse est généralement un nom ou une expression qui apparaît directement après ces mots-clés.'
+    } else if (q.question.includes('哪里') || q.question.includes('哪儿')) {
+      questionType = 'question sur un lieu (哪里/哪儿 = où)'
+      strategy = 'Cherchez les compléments de lieu dans le texte (mots avec 在, 去, 来, ou noms de lieux). La réponse est généralement un nom de lieu mentionné dans le passage.'
+    } else if (q.question.includes('几点') || q.question.includes('什么时候') || q.question.includes('时间')) {
+      questionType = 'question sur le temps (几点/什么时候 = quelle heure/quand)'
+      strategy = 'Cherchez les expressions temporelles dans le texte (时间, 点, 时候, jours de la semaine, etc.). La réponse est généralement une information temporelle explicite.'
+    } else if (q.question.includes('怎么') || q.question.includes('如何')) {
+      questionType = 'question sur la manière (怎么/如何 = comment)'
+      strategy = 'Cherchez les verbes d\'action et les adverbes de manière dans le texte. La réponse décrit généralement un processus ou une méthode mentionnée.'
+    } else if (q.question.includes('为什么') || q.question.includes('原因')) {
+      questionType = 'question sur la raison (为什么 = pourquoi)'
+      strategy = 'Cherchez les connecteurs de cause (因为, 所以, 由于) ou les explications dans le texte. La réponse explique généralement le motif ou la cause d\'une action.'
+    } else {
+      questionType = 'question de compréhension générale'
+      strategy = 'Identifiez les mots-clés de la question dans le texte. La réponse peut être directement mentionnée ou nécessiter une inférence basée sur le contexte. En chinois, les informations importantes sont souvent répétées ou reformulées.'
     }
-    return `La réponse correcte est "${q.correctAnswer}" ${q.correctPinyin ? `(${q.correctPinyin})` : ''} car elle correspond aux informations données dans le texte. Relisez attentivement le passage pour trouver la réponse.`
+    
+    if (isCorrect) {
+      return `Correct ! La réponse "${q.correctAnswer}" ${q.correctPinyin ? `(${q.correctPinyin})` : ''} est correcte. C'est une ${questionType}. ${strategy} Cette réponse correspond aux informations données dans le texte et respecte la structure grammaticale chinoise.`
+    }
+    
+    return `La réponse correcte est "${q.correctAnswer}" ${q.correctPinyin ? `(${q.correctPinyin})` : ''}. C'est une ${questionType}. ${strategy} Pour répondre correctement, il faut identifier les mots-clés de la question dans le texte et comprendre comment les informations sont structurées. En chinois, les réponses aux questions de compréhension nécessitent souvent de repérer les informations explicites ou de faire des inférences basées sur le contexte.`
   }
 
   const handleAnswerChange = (questionId: string, value: string) => {

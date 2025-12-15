@@ -30,10 +30,45 @@ export default function QuestionFormationExercise({ questions, onComplete, onPre
   }
 
   const getExplanation = (q: { underlinedPart: string; correctQuestion: string; correctPinyin: string }, userAnswer: string, isCorrect: boolean): string => {
-    if (isCorrect) {
-      return `Correct ! Pour interroger sur "${q.underlinedPart}", on utilise la question "${q.correctQuestion}" (${q.correctPinyin}).`
+    // Détecter le type de question selon le mot interrogatif utilisé
+    let questionType = ''
+    let grammarRule = ''
+    
+    if (q.correctQuestion.includes('什么')) {
+      questionType = '什么 (shénme) = "quoi/quel"'
+      grammarRule = 'Utilisé pour interroger sur des objets, choses ou concepts. Remplace le nom dans la phrase. Structure: ...什么...?'
+    } else if (q.correctQuestion.includes('谁') || q.correctQuestion.includes('谁')) {
+      questionType = '谁 (shéi/shéi) = "qui"'
+      grammarRule = 'Utilisé pour interroger sur des personnes. Remplace le sujet ou l\'objet désignant une personne. Structure: 谁 + verbe...?'
+    } else if (q.correctQuestion.includes('哪里') || q.correctQuestion.includes('哪儿')) {
+      questionType = '哪里/哪儿 (nǎlǐ/nǎr) = "où"'
+      grammarRule = 'Utilisé pour interroger sur un lieu. Remplace le complément de lieu. Structure: ...在哪里/哪儿...?'
+    } else if (q.correctQuestion.includes('怎么')) {
+      questionType = '怎么 (zěnme) = "comment"'
+      grammarRule = 'Utilisé pour interroger sur la manière ou la méthode. Se place avant le verbe. Structure: 怎么 + verbe...?'
+    } else if (q.correctQuestion.includes('为什么')) {
+      questionType = '为什么 (wèishénme) = "pourquoi"'
+      grammarRule = 'Utilisé pour interroger sur la raison. Se place en début de phrase. Structure: 为什么 + phrase...?'
+    } else if (q.correctQuestion.includes('几点') || q.correctQuestion.includes('什么时候')) {
+      questionType = '几点/什么时候 (jǐ diǎn/shénme shíhòu) = "quelle heure/quand"'
+      grammarRule = 'Utilisé pour interroger sur le temps. 几点 pour l\'heure précise, 什么时候 pour un moment général.'
+    } else if (q.correctQuestion.includes('多少') || q.correctQuestion.includes('几')) {
+      questionType = '多少/几 (duōshao/jǐ) = "combien"'
+      grammarRule = 'Utilisé pour interroger sur la quantité. 多少 pour les grands nombres, 几 pour les petits nombres (1-10).'
     }
-    return `Pour interroger sur "${q.underlinedPart}", la question correcte est "${q.correctQuestion}" (${q.correctPinyin}). Cette structure questionne spécifiquement sur la partie soulignée de la phrase.`
+    
+    if (isCorrect) {
+      if (questionType) {
+        return `Correct ! Pour interroger sur "${q.underlinedPart}", on utilise ${questionType}. ${grammarRule} La question "${q.correctQuestion}" (${q.correctPinyin}) suit cette règle grammaticale.`
+      }
+      return `Correct ! Pour interroger sur "${q.underlinedPart}", la question "${q.correctQuestion}" (${q.correctPinyin}) est correcte. En chinois, on forme les questions en remplaçant l'élément interrogé par le mot interrogatif approprié et en gardant la structure SVO.`
+    }
+    
+    if (questionType) {
+      return `Incorrect. Pour interroger sur "${q.underlinedPart}", on doit utiliser ${questionType}. ${grammarRule} La question correcte est "${q.correctQuestion}" (${q.correctPinyin}). En chinois, chaque type d'information (personne, lieu, temps, etc.) a son mot interrogatif spécifique.`
+    }
+    
+    return `Incorrect. Pour interroger sur "${q.underlinedPart}", la question correcte est "${q.correctQuestion}" (${q.correctPinyin}). En chinois, on forme les questions en remplaçant l'élément interrogé par le mot interrogatif approprié (什么, 谁, 哪里, 怎么, etc.) tout en conservant l'ordre des mots SVO.`
   }
 
   const handleAnswerChange = (id: string, value: string) => {

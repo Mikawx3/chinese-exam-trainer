@@ -38,12 +38,25 @@ export default function MatchingExercise({ leftItems, rightItems, correctPairs, 
     const rightItem = rightItems.find(item => item.id === rightId)
     if (!leftItem || !rightItem) return ''
     
+    // Détecter si c'est un exercice de mesure words (量词)
+    const isMeasureWord = leftItem.text.length === 1 && !leftItem.pinyin?.includes(' ')
+    
     if (isCorrect) {
-      return `${leftItem.text}${leftItem.pinyin ? ` (${leftItem.pinyin})` : ''} correspond correctement à ${rightItem.text}${rightItem.pinyin ? ` (${rightItem.pinyin})` : ''}.`
+      if (isMeasureWord) {
+        return `Correct ! Le mot de mesure ${leftItem.text} (${leftItem.pinyin || ''}) est utilisé avec ${rightItem.text} car en chinois, chaque type d'objet nécessite un mot de mesure spécifique. ${leftItem.text} est le mot de mesure approprié pour ${rightItem.text} selon les règles de classification des noms chinois.`
+      } else {
+        return `Correct ! ${leftItem.text}${leftItem.pinyin ? ` (${leftItem.pinyin})` : ''} correspond à ${rightItem.text}${rightItem.pinyin ? ` (${rightItem.pinyin})` : ''} car c'est la traduction directe. En chinois, le vocabulaire de base correspond généralement mot à mot avec l'anglais/français pour les concepts concrets.`
+      }
     }
+    
     const correctRight = correctPairs.find(([l]) => l === leftId)?.[1]
     const correctRightItem = rightItems.find(item => item.id === correctRight)
-    return `${leftItem.text}${leftItem.pinyin ? ` (${leftItem.pinyin})` : ''} ne correspond pas à ${rightItem.text}. La bonne correspondance est ${correctRightItem?.text || ''}${correctRightItem?.pinyin ? ` (${correctRightItem.pinyin})` : ''}.`
+    
+    if (isMeasureWord) {
+      return `Incorrect. Le mot de mesure ${leftItem.text} ne s'utilise pas avec ${rightItem.text}. La bonne correspondance est ${leftItem.text} + ${correctRightItem?.text || ''} car les mots de mesure chinois (量词) sont catégorisés selon la forme, la nature ou l'usage de l'objet. ${leftItem.text} est spécifiquement utilisé pour ${correctRightItem?.text || ''}.`
+    } else {
+      return `Incorrect. ${leftItem.text}${leftItem.pinyin ? ` (${leftItem.pinyin})` : ''} ne correspond pas à ${rightItem.text}. La bonne traduction est ${correctRightItem?.text || ''}${correctRightItem?.pinyin ? ` (${correctRightItem.pinyin})` : ''}. En chinois, certains mots ont des traductions fixes qui doivent être mémorisées.`
+    }
   }
 
   const handleLeftClick = (leftId: string) => {
@@ -73,9 +86,6 @@ export default function MatchingExercise({ leftItems, rightItems, correctPairs, 
     onComplete(correct)
   }
 
-  const getItemText = (item: MatchingItem) => {
-    return item.pinyin ? `${item.text} (${item.pinyin})` : item.text
-  }
 
   return (
     <div className="question-container">
@@ -98,7 +108,12 @@ export default function MatchingExercise({ leftItems, rightItems, correctPairs, 
                 transition: 'all 0.3s ease'
               }}
             >
-              {getItemText(item)}
+              <div className="chinese-text">{item.text}</div>
+              {item.pinyin && (
+                <div style={{ color: selectedLeft === item.id ? 'rgba(255,255,255,0.9)' : '#666', marginTop: '5px', fontSize: '0.9em' }}>
+                  {item.pinyin}
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -137,7 +152,12 @@ export default function MatchingExercise({ leftItems, rightItems, correctPairs, 
                     transition: 'all 0.3s ease'
                   }}
                 >
-                  {getItemText(item)}
+                  <div className="chinese-text">{item.text}</div>
+                  {item.pinyin && (
+                    <div style={{ color: isPaired && submitted ? 'rgba(255,255,255,0.9)' : '#666', marginTop: '5px', fontSize: '0.9em' }}>
+                      {item.pinyin}
+                    </div>
+                  )}
                 </div>
                 {submitted && isPaired && leftId && (
                   <div className={`feedback ${isCorrect ? 'correct' : 'incorrect'}`} style={{ marginTop: '5px', marginBottom: '15px', fontSize: '0.9em' }}>

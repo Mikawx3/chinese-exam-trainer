@@ -29,10 +29,22 @@ export default function NumberTimeExercise({ questions, onComplete, onPrevious, 
   }
 
   const getExplanation = (q: Question, userAnswer: string): string => {
+    const isTime = q.chinese.includes('点') || q.chinese.includes('刻') || q.chinese.includes('分')
+    const isNumber = !isTime
+    
     if (userAnswer?.trim() === q.correctAnswer.trim()) {
-      return `Correct ! ${q.chinese} (${q.pinyin}) correspond bien à ${q.correctAnswer}.`
+      if (isTime) {
+        return `Correct ! En chinois, l'heure se lit de manière séquentielle : ${q.chinese} signifie littéralement "${q.pinyin}". La structure est : heure (点) + minutes (分) ou "刻" (quart d'heure = 15 minutes). "差" signifie "moins" (ex: 差一刻八点 = 7:45).`
+      } else {
+        return `Correct ! Les nombres en chinois suivent un système décimal : ${q.chinese} (${q.pinyin}) se construit avec les unités 百 (cent), 十 (dix), et les chiffres de base. La lecture va de gauche à droite, chaque position ayant sa propre valeur.`
+      }
     }
-    return `La réponse correcte est ${q.correctAnswer} car ${q.chinese} (${q.pinyin}) se traduit par ${q.correctAnswer} en chiffres arabes.`
+    
+    if (isTime) {
+      return `La réponse correcte est ${q.correctAnswer}. En chinois, pour lire l'heure : ${q.chinese} (${q.pinyin}) suit la structure "heure点 + minutes分". "一刻" = 15 minutes, "半" = 30 minutes. "差X分Y点" signifie "Y heures moins X minutes".`
+    } else {
+      return `La réponse correcte est ${q.correctAnswer}. Les nombres chinois utilisent un système positionnel : ${q.chinese} (${q.pinyin}) se décompose avec 百 (bǎi = 100), 十 (shí = 10), et les chiffres de 1 à 9. Chaque position se lit indépendamment.`
+    }
   }
 
   const handleAnswerChange = (index: number, value: string) => {
@@ -57,8 +69,8 @@ export default function NumberTimeExercise({ questions, onComplete, onPrevious, 
       {questions.map((q, index) => (
         <div key={index} style={{ marginBottom: '20px' }}>
           <div style={{ marginBottom: '10px' }}>
-            <span className="chinese-text">{q.chinese}</span>
-            <span style={{ marginLeft: '10px', color: '#666' }}>({q.pinyin})</span>
+            <div className="chinese-text">{q.chinese}</div>
+            <div style={{ color: '#666', marginTop: '5px' }}>{q.pinyin}</div>
           </div>
           <input
             type="text"
