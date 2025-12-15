@@ -12,12 +12,29 @@ interface QuestionFormationExerciseProps {
     correctPinyin: string
   }>
   onComplete: (score: number) => void
+  onPrevious?: () => void
+  onNext?: () => void
+  onReset?: () => void
 }
 
-export default function QuestionFormationExercise({ questions, onComplete }: QuestionFormationExerciseProps) {
+export default function QuestionFormationExercise({ questions, onComplete, onPrevious, onNext, onReset }: QuestionFormationExerciseProps) {
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [submitted, setSubmitted] = useState(false)
   const [score, setScore] = useState(0)
+
+  const handleReset = () => {
+    setAnswers({})
+    setSubmitted(false)
+    setScore(0)
+    if (onReset) onReset()
+  }
+
+  const getExplanation = (q: { underlinedPart: string; correctQuestion: string; correctPinyin: string }, userAnswer: string, isCorrect: boolean): string => {
+    if (isCorrect) {
+      return `Correct ! Pour interroger sur "${q.underlinedPart}", on utilise la question "${q.correctQuestion}" (${q.correctPinyin}).`
+    }
+    return `Pour interroger sur "${q.underlinedPart}", la question correcte est "${q.correctQuestion}" (${q.correctPinyin}). Cette structure questionne spécifiquement sur la partie soulignée de la phrase.`
+  }
 
   const handleAnswerChange = (id: string, value: string) => {
     setAnswers({ ...answers, [id]: value })
@@ -82,12 +99,18 @@ export default function QuestionFormationExercise({ questions, onComplete }: Que
                   <div>
                     <strong>✓ Correct !</strong>
                     <div style={{ marginTop: '5px' }}>Votre réponse : {userAnswer}</div>
+                    <div style={{ marginTop: '8px', padding: '10px', background: 'rgba(255,255,255,0.3)', borderRadius: '5px' }}>
+                      <strong>Explication :</strong> {getExplanation(q, userAnswer, isCorrect)}
+                    </div>
                   </div>
                 ) : (
                   <div>
                     <strong>✗ Incorrect</strong>
                     <div style={{ marginTop: '5px' }}>Votre réponse : {userAnswer}</div>
                     <div style={{ marginTop: '5px' }}>Bonne réponse : {q.correctQuestion} ({q.correctPinyin})</div>
+                    <div style={{ marginTop: '8px', padding: '10px', background: 'rgba(255,255,255,0.3)', borderRadius: '5px' }}>
+                      <strong>Explication :</strong> {getExplanation(q, userAnswer, isCorrect)}
+                    </div>
                   </div>
                 )}
               </div>
@@ -101,9 +124,26 @@ export default function QuestionFormationExercise({ questions, onComplete }: Que
         </button>
       )}
       {submitted && (
-        <div className="score">
-          Score: {score} / {questions.length}
-        </div>
+        <>
+          <div className="score">
+            Score: {score} / {questions.length}
+          </div>
+          <div style={{ display: 'flex', gap: '15px', justifyContent: 'center', marginTop: '20px', flexWrap: 'wrap' }}>
+            {onPrevious && (
+              <button className="btn btn-secondary" onClick={onPrevious}>
+                ← Section précédente
+              </button>
+            )}
+            <button className="btn btn-primary" onClick={handleReset}>
+              ↻ Refaire
+            </button>
+            {onNext && (
+              <button className="btn btn-secondary" onClick={onNext}>
+                Section suivante →
+              </button>
+            )}
+          </div>
+        </>
       )}
     </div>
   )

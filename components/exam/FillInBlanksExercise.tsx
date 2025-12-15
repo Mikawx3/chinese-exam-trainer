@@ -10,20 +10,42 @@ interface FillInBlanksExerciseProps {
   }>
   wordBank: Array<{ id: string; word: string; pinyin: string }>
   onComplete: (score: number) => void
+  onPrevious?: () => void
+  onNext?: () => void
+  onReset?: () => void
 }
 
-export default function FillInBlanksExercise({ sentences, wordBank, onComplete }: FillInBlanksExerciseProps) {
+export default function FillInBlanksExercise({ sentences, wordBank, onComplete, onPrevious, onNext, onReset }: FillInBlanksExerciseProps) {
   const [selectedWords, setSelectedWords] = useState<Record<string, string>>({})
   const [usedWords, setUsedWords] = useState<Set<string>>(new Set())
   const [submitted, setSubmitted] = useState(false)
   const [score, setScore] = useState(0)
+
+  const handleReset = () => {
+    setSelectedWords({})
+    setUsedWords(new Set())
+    setSubmitted(false)
+    setScore(0)
+    if (onReset) onReset()
+  }
+
+  const getExplanation = (sentence: { id: string; sentence: string; blanks: Array<{ position: number; correctAnswer: string }> }, selectedWordId: string | undefined, isCorrect: boolean): string => {
+    const blank = sentence.blanks[0]
+    const selectedWord = wordBank.find(w => w.id === selectedWordId)
+    
+    if (isCorrect && selectedWord) {
+      return `Le mot ${selectedWord.word} (${selectedWord.pinyin}) est correct car il complète grammaticalement et sémantiquement la phrase "${sentence.sentence.replace('___', selectedWord.word)}".`
+    }
+    return `Le mot correct est ${blank.correctAnswer} car il s'intègre parfaitement dans le contexte de la phrase. ${selectedWord ? `Vous avez choisi ${selectedWord.word} (${selectedWord.pinyin}) qui ne convient pas ici.` : ''}`
+  }
 
   const handleWordSelect = (blankId: string, wordId: string) => {
     if (submitted) return
 
     // Libérer le mot précédemment utilisé par ce blank
     if (selectedWords[blankId]) {
-      setUsedWords(new Set([...usedWords].filter(id => id !== selectedWords[blankId])))
+      const newUsed = new Set(Array.from(usedWords).filter(id => id !== selectedWords[blankId]))
+      setUsedWords(newUsed)
     }
 
     // Libérer le blank qui utilisait ce mot
@@ -32,11 +54,13 @@ export default function FillInBlanksExercise({ sentences, wordBank, onComplete }
       const newSelected = { ...selectedWords }
       delete newSelected[currentBlank]
       setSelectedWords(newSelected)
+      const newUsed = new Set(Array.from(usedWords).filter(id => id !== wordId))
+      setUsedWords(newUsed)
     }
 
     // Assigner le nouveau mot
     setSelectedWords({ ...selectedWords, [blankId]: wordId })
-    setUsedWords(new Set([...usedWords, wordId]))
+    setUsedWords(new Set([...Array.from(usedWords), wordId]))
   }
 
   const handleSubmit = () => {
@@ -101,6 +125,11 @@ export default function FillInBlanksExercise({ sentences, wordBank, onComplete }
           </span>
           {parts[1]}
         </div>
+        {submitted && (
+          <div className={`feedback ${isCorrect ? 'correct' : 'incorrect'}`} style={{ marginTop: '10px', marginBottom: '15px' }}>
+            <strong>Explication :</strong> {getExplanation(sentence, blankId, isCorrect ?? false)}
+          </div>
+        )}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
           {wordBank.map((word) => {
             const isSelected = selectedWords[blankId] === word.id
@@ -143,9 +172,26 @@ export default function FillInBlanksExercise({ sentences, wordBank, onComplete }
         </button>
       )}
       {submitted && (
-        <div className="score">
-          Score: {score} / {sentences.reduce((sum, s) => sum + s.blanks.length, 0)}
-        </div>
+        <>
+          <div className="score">
+            Score: {score} / {sentences.reduce((sum, s) => sum + s.blanks.length, 0)}
+          </div>
+          <div style={{ display: 'flex', gap: '15px', justifyContent: 'center', marginTop: '20px', flexWrap: 'wrap' }}>
+            {onPrevious && (
+              <button className="btn btn-secondary" onClick={onPrevious}>
+                ← Section précédente
+              </button>
+            )}
+            <button className="btn btn-primary" onClick={handleReset}>
+              ↻ Refaire
+            </button>
+            {onNext && (
+              <button className="btn btn-secondary" onClick={onNext}>
+                Section suivante →
+              </button>
+            )}
+          </div>
+        </>
       )}
     </div>
   )

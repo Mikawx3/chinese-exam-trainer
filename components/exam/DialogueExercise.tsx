@@ -5,7 +5,7 @@ import { useState } from 'react'
 interface DialogueExerciseProps {
   dialogues: Array<{
     id: string
-    context: string
+    context?: string
     parts: Array<{
       speaker: 'A' | 'B'
       text?: string
@@ -16,12 +16,28 @@ interface DialogueExerciseProps {
     }>
   }>
   onComplete: (score: number) => void
+  onPrevious?: () => void
+  onNext?: () => void
+  onReset?: () => void
 }
 
 export default function DialogueExercise({ dialogues, onComplete }: DialogueExerciseProps) {
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [submitted, setSubmitted] = useState(false)
   const [score, setScore] = useState(0)
+
+  const handleReset = () => {
+    setAnswers({})
+    setSubmitted(false)
+    setScore(0)
+  }
+
+  const getExplanation = (part: { correctAnswer?: string; correctPinyin?: string }, userAnswer: string, isCorrect: boolean): string => {
+    if (isCorrect && part.correctAnswer) {
+      return `Correct ! Dans ce contexte de dialogue, "${part.correctAnswer}" (${part.correctPinyin || ''}) est la réponse appropriée qui s'enchaîne naturellement avec les répliques précédentes.`
+    }
+    return `La réponse correcte est "${part.correctAnswer || ''}" (${part.correctPinyin || ''}) car elle s'intègre logiquement dans le contexte du dialogue et répond de manière appropriée à la question ou à la déclaration précédente.`
+  }
 
   const handleAnswerChange = (blankId: string, value: string) => {
     setAnswers({ ...answers, [blankId]: value })
@@ -68,8 +84,8 @@ export default function DialogueExercise({ dialogues, onComplete }: DialogueExer
             {dialogue.parts.map((part, index) => {
               const blankId = `${dialogue.id}-${index}`
               const userAnswer = answers[blankId] || ''
-              const isCorrect = submitted && part.isBlank && part.correctAnswer && 
-                normalizeAnswer(userAnswer) === normalizeAnswer(part.correctAnswer)
+              const isCorrect = Boolean(submitted && part.isBlank && part.correctAnswer && 
+                normalizeAnswer(userAnswer) === normalizeAnswer(part.correctAnswer))
               const isIncorrect = submitted && part.isBlank && userAnswer && !isCorrect
 
               if (part.isBlank) {
@@ -93,9 +109,19 @@ export default function DialogueExercise({ dialogues, onComplete }: DialogueExer
                     {submitted && part.correctAnswer && (
                       <div className={`feedback ${isCorrect ? 'correct' : 'incorrect'}`} style={{ marginTop: '5px', padding: '8px', fontSize: '0.9em' }}>
                         {isCorrect ? (
-                          <span>✓ Correct</span>
+                          <div>
+                            <span>✓ Correct</span>
+                            <div style={{ marginTop: '5px', padding: '5px', background: 'rgba(255,255,255,0.3)', borderRadius: '3px' }}>
+                              <strong>Explication :</strong> {getExplanation(part, userAnswer, isCorrect ?? false)}
+                            </div>
+                          </div>
                         ) : (
-                          <span>✗ Bonne réponse : {part.correctAnswer} {part.correctPinyin && `(${part.correctPinyin})`}</span>
+                          <div>
+                            <span>✗ Bonne réponse : {part.correctAnswer} {part.correctPinyin && `(${part.correctPinyin})`}</span>
+                            <div style={{ marginTop: '5px', padding: '5px', background: 'rgba(255,255,255,0.3)', borderRadius: '3px' }}>
+                              <strong>Explication :</strong> {getExplanation(part, userAnswer, isCorrect ?? false)}
+                            </div>
+                          </div>
                         )}
                       </div>
                     )}
@@ -122,9 +148,16 @@ export default function DialogueExercise({ dialogues, onComplete }: DialogueExer
         </button>
       )}
       {submitted && (
-        <div className="score">
-          Score: {score} / {dialogues.reduce((sum, d) => sum + d.parts.filter(p => p.isBlank).length, 0)}
-        </div>
+        <>
+          <div className="score">
+            Score: {score} / {dialogues.reduce((sum, d) => sum + d.parts.filter(p => p.isBlank).length, 0)}
+          </div>
+          <div style={{ display: 'flex', gap: '15px', justifyContent: 'center', marginTop: '20px', flexWrap: 'wrap' }}>
+            <button className="btn btn-primary" onClick={handleReset}>
+              ↻ Refaire
+            </button>
+          </div>
+        </>
       )}
     </div>
   )

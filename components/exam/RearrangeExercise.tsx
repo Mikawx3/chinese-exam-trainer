@@ -11,12 +11,29 @@ interface RearrangeExerciseProps {
     correctPinyin: string
   }>
   onComplete: (score: number) => void
+  onPrevious?: () => void
+  onNext?: () => void
+  onReset?: () => void
 }
 
-export default function RearrangeExercise({ questions, onComplete }: RearrangeExerciseProps) {
+export default function RearrangeExercise({ questions, onComplete, onPrevious, onNext, onReset }: RearrangeExerciseProps) {
   const [selectedWords, setSelectedWords] = useState<Record<string, number[]>>({})
   const [submitted, setSubmitted] = useState(false)
   const [score, setScore] = useState(0)
+
+  const handleReset = () => {
+    setSelectedWords({})
+    setSubmitted(false)
+    setScore(0)
+    if (onReset) onReset()
+  }
+
+  const getExplanation = (q: { correctSentence: string; correctPinyin: string }, userOrder: number[], isCorrect: boolean): string => {
+    if (isCorrect) {
+      return `Correct ! L'ordre des mots "${q.correctSentence}" (${q.correctPinyin}) respecte la structure grammaticale chinoise : sujet + verbe + complément.`
+    }
+    return `L'ordre correct est "${q.correctSentence}" (${q.correctPinyin}). En chinois, l'ordre des mots suit généralement la structure : sujet + verbe + complément.`
+  }
 
   const handleWordClick = (questionId: string, wordIndex: number) => {
     if (submitted) return
@@ -140,11 +157,17 @@ export default function RearrangeExercise({ questions, onComplete }: RearrangeEx
                   <div>
                     <strong>✓ Correct !</strong>
                     <div style={{ marginTop: '5px' }}>Phrase correcte : {q.correctSentence} ({q.correctPinyin})</div>
+                    <div style={{ marginTop: '8px', padding: '10px', background: 'rgba(255,255,255,0.3)', borderRadius: '5px' }}>
+                      <strong>Explication :</strong> {getExplanation(q, userOrder, isCorrect)}
+                    </div>
                   </div>
                 ) : (
                   <div>
                     <strong>✗ Incorrect</strong>
                     <div style={{ marginTop: '5px' }}>Bonne réponse : {q.correctSentence} ({q.correctPinyin})</div>
+                    <div style={{ marginTop: '8px', padding: '10px', background: 'rgba(255,255,255,0.3)', borderRadius: '5px' }}>
+                      <strong>Explication :</strong> {getExplanation(q, userOrder, isCorrect)}
+                    </div>
                   </div>
                 )}
               </div>
@@ -158,9 +181,26 @@ export default function RearrangeExercise({ questions, onComplete }: RearrangeEx
         </button>
       )}
       {submitted && (
-        <div className="score">
-          Score: {score} / {questions.length}
-        </div>
+        <>
+          <div className="score">
+            Score: {score} / {questions.length}
+          </div>
+          <div style={{ display: 'flex', gap: '15px', justifyContent: 'center', marginTop: '20px', flexWrap: 'wrap' }}>
+            {onPrevious && (
+              <button className="btn btn-secondary" onClick={onPrevious}>
+                ← Section précédente
+              </button>
+            )}
+            <button className="btn btn-primary" onClick={handleReset}>
+              ↻ Refaire
+            </button>
+            {onNext && (
+              <button className="btn btn-secondary" onClick={onNext}>
+                Section suivante →
+              </button>
+            )}
+          </div>
+        </>
       )}
     </div>
   )

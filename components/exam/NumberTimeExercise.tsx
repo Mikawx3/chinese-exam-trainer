@@ -11,12 +11,29 @@ interface Question {
 interface NumberTimeExerciseProps {
   questions: Question[]
   onComplete: (score: number) => void
+  onPrevious?: () => void
+  onNext?: () => void
+  onReset?: () => void
 }
 
-export default function NumberTimeExercise({ questions, onComplete }: NumberTimeExerciseProps) {
+export default function NumberTimeExercise({ questions, onComplete, onPrevious, onNext, onReset }: NumberTimeExerciseProps) {
   const [answers, setAnswers] = useState<Record<number, string>>({})
   const [submitted, setSubmitted] = useState(false)
   const [score, setScore] = useState(0)
+
+  const handleReset = () => {
+    setAnswers({})
+    setSubmitted(false)
+    setScore(0)
+    if (onReset) onReset()
+  }
+
+  const getExplanation = (q: Question, userAnswer: string): string => {
+    if (userAnswer?.trim() === q.correctAnswer.trim()) {
+      return `Correct ! ${q.chinese} (${q.pinyin}) correspond bien à ${q.correctAnswer}.`
+    }
+    return `La réponse correcte est ${q.correctAnswer} car ${q.chinese} (${q.pinyin}) se traduit par ${q.correctAnswer} en chiffres arabes.`
+  }
 
   const handleAnswerChange = (index: number, value: string) => {
     setAnswers({ ...answers, [index]: value })
@@ -61,9 +78,19 @@ export default function NumberTimeExercise({ questions, onComplete }: NumberTime
           {submitted && (
             <div className={`feedback ${answers[index]?.trim() === q.correctAnswer.trim() ? 'correct' : 'incorrect'}`} style={{ marginTop: '10px' }}>
               {answers[index]?.trim() === q.correctAnswer.trim() ? (
-                '✓ Correct'
+                <div>
+                  <strong>✓ Correct</strong>
+                  <div style={{ marginTop: '8px', padding: '10px', background: 'rgba(255,255,255,0.3)', borderRadius: '5px' }}>
+                    <strong>Explication :</strong> {getExplanation(q, answers[index] || '')}
+                  </div>
+                </div>
               ) : (
-                `✗ Incorrect. La bonne réponse est : ${q.correctAnswer}`
+                <div>
+                  <strong>✗ Incorrect. La bonne réponse est : {q.correctAnswer}</strong>
+                  <div style={{ marginTop: '8px', padding: '10px', background: 'rgba(255,255,255,0.3)', borderRadius: '5px' }}>
+                    <strong>Explication :</strong> {getExplanation(q, answers[index] || '')}
+                  </div>
+                </div>
               )}
             </div>
           )}
@@ -75,9 +102,26 @@ export default function NumberTimeExercise({ questions, onComplete }: NumberTime
         </button>
       )}
       {submitted && (
-        <div className="score">
-          Score: {score} / {questions.length}
-        </div>
+        <>
+          <div className="score">
+            Score: {score} / {questions.length}
+          </div>
+          <div style={{ display: 'flex', gap: '15px', justifyContent: 'center', marginTop: '20px', flexWrap: 'wrap' }}>
+            {onPrevious && (
+              <button className="btn btn-secondary" onClick={onPrevious}>
+                ← Section précédente
+              </button>
+            )}
+            <button className="btn btn-primary" onClick={handleReset}>
+              ↻ Refaire
+            </button>
+            {onNext && (
+              <button className="btn btn-secondary" onClick={onNext}>
+                Section suivante →
+              </button>
+            )}
+          </div>
+        </>
       )}
     </div>
   )

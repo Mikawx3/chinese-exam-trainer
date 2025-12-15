@@ -111,6 +111,26 @@ export default function ExamPage() {
 
     const sectionKey = section.key as keyof typeof selectedExam.sections
     const sectionData = selectedExam.sections[sectionKey]
+    const currentIndex = availableSections.findIndex(s => s.key === currentSection)
+    const hasPrevious = currentIndex > 0
+    const hasNext = currentIndex < availableSections.length - 1
+
+    const handlePrevious = () => {
+      if (hasPrevious) {
+        setCurrentSection(availableSections[currentIndex - 1].key)
+      }
+    }
+
+    const handleNext = () => {
+      if (hasNext) {
+        setCurrentSection(availableSections[currentIndex + 1].key)
+      }
+    }
+
+    const handleReset = () => {
+      setSectionScores({ ...sectionScores, [currentSection]: undefined })
+      setSectionMaxScores({ ...sectionMaxScores, [currentSection]: undefined })
+    }
 
     return (
       <div className="container">
@@ -121,8 +141,11 @@ export default function ExamPage() {
         
         {section.key === 'numberTime' && sectionData && 'questions' in sectionData && (
           <NumberTimeExercise
-            questions={sectionData.questions}
-            onComplete={(score) => handleSectionComplete(currentSection, score, sectionData.questions.length)}
+            questions={sectionData.questions as Array<{ chinese: string; pinyin: string; correctAnswer: string }>}
+            onComplete={(score) => handleSectionComplete(currentSection, score, (sectionData.questions as Array<{ chinese: string; pinyin: string; correctAnswer: string }>).length)}
+            onPrevious={hasPrevious ? handlePrevious : undefined}
+            onNext={hasNext ? handleNext : undefined}
+            onReset={handleReset}
           />
         )}
         
@@ -133,6 +156,9 @@ export default function ExamPage() {
             correctPairs={sectionData.correctPairs}
             onComplete={(score) => handleSectionComplete(currentSection, score, sectionData.leftItems.length)}
             title={getSectionName(currentSection)}
+            onPrevious={hasPrevious ? handlePrevious : undefined}
+            onNext={hasNext ? handleNext : undefined}
+            onReset={handleReset}
           />
         )}
         
@@ -142,6 +168,9 @@ export default function ExamPage() {
             objects={sectionData.objects}
             correctPairs={sectionData.correctPairs}
             onComplete={(score) => handleSectionComplete(currentSection, score, sectionData.verbs.length)}
+            onPrevious={hasPrevious ? handlePrevious : undefined}
+            onNext={hasNext ? handleNext : undefined}
+            onReset={handleReset}
           />
         )}
         
@@ -150,20 +179,55 @@ export default function ExamPage() {
             sentences={sectionData.sentences}
             wordBank={sectionData.wordBank}
             onComplete={(score) => handleSectionComplete(currentSection, score, sectionData.sentences.reduce((sum, s) => sum + s.blanks.length, 0))}
+            onPrevious={hasPrevious ? handlePrevious : undefined}
+            onNext={hasNext ? handleNext : undefined}
+            onReset={handleReset}
           />
         )}
         
         {section.key === 'questionFormation' && sectionData && 'questions' in sectionData && (
           <QuestionFormationExercise
-            questions={sectionData.questions}
-            onComplete={(score) => handleSectionComplete(currentSection, score, sectionData.questions.length)}
+            questions={sectionData.questions as Array<{
+              id: string
+              sentence: string
+              pinyin: string
+              underlinedPart: string
+              correctQuestion: string
+              correctPinyin: string
+            }>}
+            onComplete={(score) => handleSectionComplete(currentSection, score, (sectionData.questions as Array<{
+              id: string
+              sentence: string
+              pinyin: string
+              underlinedPart: string
+              correctQuestion: string
+              correctPinyin: string
+            }>).length)}
+            onPrevious={hasPrevious ? handlePrevious : undefined}
+            onNext={hasNext ? handleNext : undefined}
+            onReset={handleReset}
           />
         )}
         
         {section.key === 'rearrange' && sectionData && 'questions' in sectionData && (
           <RearrangeExercise
-            questions={sectionData.questions}
-            onComplete={(score) => handleSectionComplete(currentSection, score, sectionData.questions.length)}
+            questions={sectionData.questions as Array<{
+              id: string
+              words: Array<{ word: string; pinyin: string }>
+              correctOrder: number[]
+              correctSentence: string
+              correctPinyin: string
+            }>}
+            onComplete={(score) => handleSectionComplete(currentSection, score, (sectionData.questions as Array<{
+              id: string
+              words: Array<{ word: string; pinyin: string }>
+              correctOrder: number[]
+              correctSentence: string
+              correctPinyin: string
+            }>).length)}
+            onPrevious={hasPrevious ? handlePrevious : undefined}
+            onNext={hasNext ? handleNext : undefined}
+            onReset={handleReset}
           />
         )}
         
@@ -171,14 +235,32 @@ export default function ExamPage() {
           <DialogueExercise
             dialogues={sectionData.dialogues}
             onComplete={(score) => handleSectionComplete(currentSection, score, sectionData.dialogues.reduce((sum, d) => sum + d.parts.filter(p => p.isBlank).length, 0))}
+            onPrevious={hasPrevious ? handlePrevious : undefined}
+            onNext={hasNext ? handleNext : undefined}
+            onReset={handleReset}
           />
         )}
         
         {section.key === 'readingComprehension' && sectionData && 'passage' in sectionData && (
           <ReadingComprehensionExercise
             passage={sectionData.passage}
-            questions={sectionData.questions}
-            onComplete={(score) => handleSectionComplete(currentSection, score, sectionData.questions.length)}
+            questions={sectionData.questions as Array<{
+              id: string
+              question: string
+              pinyin: string
+              correctAnswer: string
+              correctPinyin?: string
+            }>}
+            onComplete={(score) => handleSectionComplete(currentSection, score, (sectionData.questions as Array<{
+              id: string
+              question: string
+              pinyin: string
+              correctAnswer: string
+              correctPinyin?: string
+            }>).length)}
+            onPrevious={hasPrevious ? handlePrevious : undefined}
+            onNext={hasNext ? handleNext : undefined}
+            onReset={handleReset}
           />
         )}
       </div>
