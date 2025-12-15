@@ -128,8 +128,10 @@ export default function ExamPage() {
     }
 
     const handleReset = () => {
-      setSectionScores({ ...sectionScores, [currentSection]: undefined })
-      setSectionMaxScores({ ...sectionMaxScores, [currentSection]: undefined })
+      const { [currentSection]: _, ...restScores } = sectionScores
+      const { [currentSection]: __, ...restMaxScores } = sectionMaxScores
+      setSectionScores(restScores)
+      setSectionMaxScores(restMaxScores)
     }
 
     return (
