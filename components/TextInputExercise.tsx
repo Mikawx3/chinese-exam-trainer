@@ -8,7 +8,8 @@ interface Exercise {
   questions: Array<{
     question: string
     chinese?: string
-    correctAnswer: string | string[]
+    options?: string[]
+    correctAnswer: string | number | string[]
     explanation?: string
     hint?: string
   }>
@@ -31,14 +32,14 @@ export default function TextInputExercise({ exercise }: TextInputExerciseProps) 
     return answer.trim().toLowerCase().replace(/\s+/g, ' ')
   }
 
-  const checkAnswer = (user: string, correct: string | string[]): boolean => {
+  const checkAnswer = (user: string, correct: string | number | string[]): boolean => {
     const normalizedUser = normalizeAnswer(user)
     
     if (Array.isArray(correct)) {
-      return correct.some(c => normalizeAnswer(c) === normalizedUser)
+      return correct.some(c => normalizeAnswer(String(c)) === normalizedUser)
     }
     
-    return normalizeAnswer(correct) === normalizedUser
+    return normalizeAnswer(String(correct)) === normalizedUser
   }
 
   const handleSubmit = () => {

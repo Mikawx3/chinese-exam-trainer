@@ -8,9 +8,10 @@ interface Exercise {
   questions: Array<{
     question: string
     chinese?: string
-    options: string[]
-    correctAnswer: number
+    options?: string[]
+    correctAnswer: number | string | string[]
     explanation?: string
+    hint?: string
   }>
 }
 
@@ -26,6 +27,11 @@ export default function MultipleChoiceExercise({ exercise }: MultipleChoiceExerc
   const [answered, setAnswered] = useState(false)
 
   const question = exercise.questions[currentQuestion]
+  
+  // Vérification de type pour les exercices à choix multiples
+  if (!question.options || typeof question.correctAnswer !== 'number') {
+    return <div>Erreur : Cet exercice n'est pas un exercice à choix multiples valide.</div>
+  }
 
   const handleAnswerSelect = (index: number) => {
     if (answered) return
