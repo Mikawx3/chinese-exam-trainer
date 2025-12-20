@@ -269,16 +269,16 @@ export const reviewQuestions: ReviewQuestion[] = [
     number: 33,
     question: '你星期几常常上网？',
     pinyin: 'nǐ xīngqī jǐ chángcháng shàngwǎng',
-    correctAnswer: '我每天晚上常常上网。',
-    correctPinyin: 'wǒ měitiān wǎnshàng chángcháng shàngwǎng.'
+    correctAnswer: '我每天晚上上网。',
+    correctPinyin: 'wǒ měitiān wǎnshàng shàngwǎng.'
   },
   {
     id: 'q34',
     number: 34,
     question: '你星期几常常睡觉？',
     pinyin: 'nǐ xīngqī jǐ chángcháng shuìjiào',
-    correctAnswer: '我每天晚上十一点常常睡觉。',
-    correctPinyin: 'wǒ měitiān wǎnshàng shíyī diǎn chángcháng shuìjiào.'
+    correctAnswer: '我每天晚上十一点睡觉。',
+    correctPinyin: 'wǒ měitiān wǎnshàng shíyī diǎn shuìjiào.'
   },
   {
     id: 'q35',
@@ -299,18 +299,18 @@ export const reviewQuestions: ReviewQuestion[] = [
   {
     id: 'q37',
     number: 37,
-    question: '你星期几常常起床？',
-    pinyin: 'nǐ xīngqī jǐ chángcháng qǐchuáng',
-    correctAnswer: '我每天七点常常起床。',
-    correctPinyin: 'wǒ měitiān qī diǎn chángcháng qǐchuáng.'
+    question: '你每天几点常常起床？',
+    pinyin: 'nǐ měitiān jǐ diǎn chángcháng qǐchuáng',
+    correctAnswer: '我每天七点起床。',
+    correctPinyin: 'wǒ měitiān qī diǎn qǐchuáng.'
   },
   {
     id: 'q38',
     number: 38,
     question: '你星期几常常洗澡？',
     pinyin: 'nǐ xīngqī jǐ chángcháng xǐzǎo',
-    correctAnswer: '我每天晚上常常洗澡。',
-    correctPinyin: 'wǒ měitiān wǎnshàng chángcháng xǐzǎo.'
+    correctAnswer: '我每天晚上洗澡。',
+    correctPinyin: 'wǒ měitiān wǎnshàng xǐzǎo.'
   },
   {
     id: 'q39',
@@ -349,8 +349,8 @@ export const reviewQuestions: ReviewQuestion[] = [
     number: 43,
     question: '你星期几常常骑自行车？',
     pinyin: 'nǐ xīngqī jǐ chángcháng qí zìxíngchē',
-    correctAnswer: '我每天下午常常骑自行车。',
-    correctPinyin: 'wǒ měitiān xiàwǔ chángcháng qí zìxíngchē.'
+    correctAnswer: '我每天下午骑自行车。',
+    correctPinyin: 'wǒ měitiān xiàwǔ qí zìxíngchē.'
   },
   {
     id: 'q44',
@@ -429,8 +429,8 @@ export const reviewQuestions: ReviewQuestion[] = [
     number: 53,
     question: '你什么时候上网？',
     pinyin: 'nǐ shénme shíhòu shàngwǎng',
-    correctAnswer: '我晚上时候上网。',
-    correctPinyin: 'wǒ wǎnshàng shíhòu shàngwǎng.'
+    correctAnswer: '我晚上上网。',
+    correctPinyin: 'wǒ wǎnshàng shàngwǎng.'
   },
   {
     id: 'q54',
@@ -749,8 +749,8 @@ export const reviewQuestions: ReviewQuestion[] = [
     number: 93,
     question: '你什么时候回国？',
     pinyin: 'nǐ shénme shíhòu huí guó',
-    correctAnswer: '我十二月时候回国。',
-    correctPinyin: 'wǒ shíèryuè shíhòu huí guó.'
+    correctAnswer: '我十二月回国。',
+    correctPinyin: 'wǒ shíèryuè huí guó.'
   }
 ]
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { reviewQuestions } from '@/data/reviewQuestions'
 
@@ -14,21 +14,124 @@ function shuffleArray<T>(array: T[]): T[] {
   return shuffled
 }
 
+const STORAGE_KEYS = {
+  answers: 'review_answers',
+  checkedAnswers: 'review_checked',
+  correctAnswers: 'review_correct',
+  markedQuestions: 'review_marked',
+  shuffledOrder: 'review_shuffled_order',
+  currentIndex: 'review_current_index',
+  showOnlyMarked: 'review_show_only_marked'
+}
+
 export default function ReviewPage() {
   const router = useRouter()
   
-  // Mélanger les questions une seule fois au chargement du composant
-  const shuffledQuestions = useMemo(() => shuffleArray(reviewQuestions), [])
+  // Charger les données depuis localStorage au démarrage
+  const [loaded, setLoaded] = useState(false)
+  const [showOnlyMarked, setShowOnlyMarked] = useState(false)
+  
+  // Charger l'ordre mélangé sauvegardé ou créer un nouvel ordre
+  const shuffledQuestions = useMemo(() => {
+    if (typeof window === 'undefined') return reviewQuestions
+    
+    const savedOrder = localStorage.getItem(STORAGE_KEYS.shuffledOrder)
+    if (savedOrder) {
+      try {
+        const order = JSON.parse(savedOrder) as string[]
+        // Reconstruire l'ordre à partir des IDs sauvegardés
+        return order.map(id => reviewQuestions.find(q => q.id === id)!).filter(Boolean)
+      } catch (e) {
+        console.error('Error loading saved order:', e)
+      }
+    }
+    
+    // Créer un nouvel ordre et le sauvegarder
+    const shuffled = shuffleArray(reviewQuestions)
+    localStorage.setItem(STORAGE_KEYS.shuffledOrder, JSON.stringify(shuffled.map(q => q.id)))
+    return shuffled
+  }, [])
   
   const [currentIndex, setCurrentIndex] = useState(0)
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [checkedAnswers, setCheckedAnswers] = useState<Record<string, boolean>>({})
   const [showCorrectAnswer, setShowCorrectAnswer] = useState<Record<string, boolean>>({})
+  const [markedQuestions, setMarkedQuestions] = useState<Set<string>>(new Set())
+  
+  // Charger les données depuis localStorage au montage
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    
+    try {
+      const savedAnswers = localStorage.getItem(STORAGE_KEYS.answers)
+      const savedChecked = localStorage.getItem(STORAGE_KEYS.checkedAnswers)
+      const savedCorrect = localStorage.getItem(STORAGE_KEYS.correctAnswers)
+      const savedMarked = localStorage.getItem(STORAGE_KEYS.markedQuestions)
+      const savedIndex = localStorage.getItem(STORAGE_KEYS.currentIndex)
+      const savedShowOnlyMarked = localStorage.getItem(STORAGE_KEYS.showOnlyMarked)
+      
+      if (savedAnswers) setAnswers(JSON.parse(savedAnswers))
+      if (savedChecked) setCheckedAnswers(JSON.parse(savedChecked))
+      if (savedCorrect) setShowCorrectAnswer(JSON.parse(savedCorrect))
+      if (savedMarked) setMarkedQuestions(new Set(JSON.parse(savedMarked)))
+      if (savedIndex) setCurrentIndex(parseInt(savedIndex, 10))
+      if (savedShowOnlyMarked) setShowOnlyMarked(savedShowOnlyMarked === 'true')
+    } catch (e) {
+      console.error('Error loading from localStorage:', e)
+    }
+    setLoaded(true)
+  }, [])
+  
+  // Sauvegarder dans localStorage à chaque changement
+  useEffect(() => {
+    if (!loaded || typeof window === 'undefined') return
+    
+    try {
+      localStorage.setItem(STORAGE_KEYS.answers, JSON.stringify(answers))
+      localStorage.setItem(STORAGE_KEYS.checkedAnswers, JSON.stringify(checkedAnswers))
+      localStorage.setItem(STORAGE_KEYS.correctAnswers, JSON.stringify(showCorrectAnswer))
+      localStorage.setItem(STORAGE_KEYS.markedQuestions, JSON.stringify(Array.from(markedQuestions)))
+      localStorage.setItem(STORAGE_KEYS.currentIndex, currentIndex.toString())
+      localStorage.setItem(STORAGE_KEYS.showOnlyMarked, showOnlyMarked.toString())
+    } catch (e) {
+      console.error('Error saving to localStorage:', e)
+    }
+  }, [answers, checkedAnswers, showCorrectAnswer, markedQuestions, currentIndex, showOnlyMarked, loaded])
+  
+  // Filtrer les questions selon le mode
+  const filteredQuestions = useMemo(() => {
+    if (showOnlyMarked) {
+      return shuffledQuestions.filter(q => markedQuestions.has(q.id))
+    }
+    return shuffledQuestions
+  }, [shuffledQuestions, showOnlyMarked, markedQuestions])
+  
+  // Ajuster l'index si nécessaire après filtrage
+  useEffect(() => {
+    if (filteredQuestions.length > 0 && currentIndex >= filteredQuestions.length) {
+      setCurrentIndex(Math.max(0, filteredQuestions.length - 1))
+    }
+  }, [filteredQuestions.length, currentIndex])
 
-  const currentQuestion = shuffledQuestions[currentIndex]
+  const currentQuestion = filteredQuestions[currentIndex]
+  if (!currentQuestion) {
+    return (
+      <div className="container">
+        <button className="btn btn-secondary back-button" onClick={() => router.push('/')}>
+          ← Retour à l'accueil
+        </button>
+        <h1>复习问题 - 根据回答写问题</h1>
+        <p style={{ marginBottom: '30px', textAlign: 'center', color: '#666' }}>
+          {showOnlyMarked ? 'Aucune question marquée pour le moment.' : 'Chargement...'}
+        </p>
+      </div>
+    )
+  }
+  
   const userAnswer = answers[currentQuestion.id] || ''
   const isChecked = checkedAnswers[currentQuestion.id] || false
   const isCorrect = showCorrectAnswer[currentQuestion.id] || false
+  const isMarked = markedQuestions.has(currentQuestion.id)
 
   const normalizeAnswer = (answer: string): string => {
     return answer
@@ -124,8 +227,30 @@ export default function ReviewPage() {
   }
 
   const handleNext = () => {
-    if (currentIndex < shuffledQuestions.length - 1) {
+    if (currentIndex < filteredQuestions.length - 1) {
       setCurrentIndex(currentIndex + 1)
+    }
+  }
+  
+  const handleToggleMark = () => {
+    const newMarked = new Set(markedQuestions)
+    if (isMarked) {
+      newMarked.delete(currentQuestion.id)
+    } else {
+      newMarked.add(currentQuestion.id)
+    }
+    setMarkedQuestions(newMarked)
+  }
+  
+  const handleClearProgress = () => {
+    if (confirm('Êtes-vous sûr de vouloir effacer toute votre progression ?')) {
+      localStorage.removeItem(STORAGE_KEYS.answers)
+      localStorage.removeItem(STORAGE_KEYS.checkedAnswers)
+      localStorage.removeItem(STORAGE_KEYS.correctAnswers)
+      localStorage.removeItem(STORAGE_KEYS.markedQuestions)
+      localStorage.removeItem(STORAGE_KEYS.shuffledOrder)
+      localStorage.removeItem(STORAGE_KEYS.currentIndex)
+      window.location.reload()
     }
   }
 
@@ -135,9 +260,10 @@ export default function ReviewPage() {
     }
   }
 
-  const progress = ((currentIndex + 1) / shuffledQuestions.length) * 100
+  const progress = filteredQuestions.length > 0 ? ((currentIndex + 1) / filteredQuestions.length) * 100 : 0
   const answeredCount = Object.keys(answers).filter(id => answers[id]?.trim().length > 0).length
   const correctCount = Object.values(showCorrectAnswer).filter(v => v === true).length
+  const markedCount = markedQuestions.size
 
   return (
     <div className="container">
@@ -146,9 +272,43 @@ export default function ReviewPage() {
       </button>
       
       <h1>复习问题 - 根据回答写问题</h1>
-      <p style={{ marginBottom: '30px', textAlign: 'center', color: '#666' }}>
-        93 questions de révision - Voyez la réponse et formulez la question
-      </p>
+      <div style={{ marginBottom: '30px', textAlign: 'center' }}>
+        <p style={{ color: '#666', marginBottom: '15px' }}>
+          93 questions de révision - Voyez la réponse et formulez la question
+        </p>
+        <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap' }}>
+          <button
+            onClick={() => setShowOnlyMarked(!showOnlyMarked)}
+            style={{
+              padding: '8px 16px',
+              background: showOnlyMarked ? '#ffc107' : '#667eea',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              fontSize: '0.9em',
+              fontWeight: 'bold'
+            }}
+          >
+            ⭐ {showOnlyMarked ? 'Toutes les questions' : 'Questions marquées'} ({markedCount})
+          </button>
+          <button
+            onClick={handleClearProgress}
+            style={{
+              padding: '8px 16px',
+              background: '#dc3545',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              fontSize: '0.9em',
+              fontWeight: 'bold'
+            }}
+          >
+            🗑️ Effacer progression
+          </button>
+        </div>
+      </div>
 
       <div style={{ marginBottom: '30px' }}>
         <div style={{ 
@@ -158,7 +318,8 @@ export default function ReviewPage() {
           marginBottom: '10px'
         }}>
           <div style={{ fontSize: '1.1em', fontWeight: 'bold', color: '#667eea' }}>
-            Question {currentIndex + 1} / {shuffledQuestions.length}
+            Question {currentIndex + 1} / {filteredQuestions.length}
+            {showOnlyMarked && <span style={{ fontSize: '0.8em', color: '#ffc107' }}> (⭐ {markedCount} marquées)</span>}
           </div>
           <div style={{ fontSize: '0.9em', color: '#666' }}>
             ✓ Correctes: {correctCount} | Répondues: {answeredCount}
@@ -253,6 +414,23 @@ export default function ReviewPage() {
             fontSize: '1.1em'
           }}>
             {currentQuestion.number}. 你的问题 (Votre question) :
+            <button
+              onClick={handleToggleMark}
+              style={{
+                marginLeft: '15px',
+                background: 'none',
+                border: 'none',
+                fontSize: '1.5em',
+                cursor: 'pointer',
+                padding: '0',
+                lineHeight: '1',
+                color: isMarked ? '#ffc107' : '#ccc',
+                transition: 'all 0.2s ease'
+              }}
+              title={isMarked ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+            >
+              {isMarked ? '⭐' : '☆'}
+            </button>
           </label>
           <textarea
             className="input-field"
@@ -370,10 +548,10 @@ export default function ReviewPage() {
         <button
           className="btn btn-secondary"
           onClick={handleNext}
-          disabled={currentIndex === shuffledQuestions.length - 1}
+          disabled={currentIndex === filteredQuestions.length - 1}
           style={{
-            opacity: currentIndex === shuffledQuestions.length - 1 ? 0.5 : 1,
-            cursor: currentIndex === shuffledQuestions.length - 1 ? 'not-allowed' : 'pointer'
+            opacity: currentIndex === filteredQuestions.length - 1 ? 0.5 : 1,
+            cursor: currentIndex === filteredQuestions.length - 1 ? 'not-allowed' : 'pointer'
           }}
         >
           下一题 (Question suivante) →
