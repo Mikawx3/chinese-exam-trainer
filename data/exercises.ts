@@ -40,8 +40,8 @@ export const exerciseData: Record<string, Exercise> = {
       {
         question: 'Quel mot interrogatif utilise-t-on pour demander "quoi" ?',
         chinese: '这是什么？',
-        options: ['怎么 (zěnme)', '什么 (shénme)', '哪里 (nǎlǐ)', '为什么 (wèishénme)'],
-        correctAnswer: 1,
+        options: ['怎么 (zěnme)', '哪里 (nǎlǐ)', '什么 (shénme)', '为什么 (wèishénme)'],
+        correctAnswer: 2,
         explanation: '什么 (shénme) signifie "quoi" ou "quel".'
       },
       {
@@ -75,8 +75,8 @@ export const exerciseData: Record<string, Exercise> = {
       },
       {
         question: 'Traduisez : "请进"',
-        options: ['S\'il vous plaît, entrez', 'S\'il vous plaît, sortez', 'S\'il vous plaît, attendez', 'S\'il vous plaît, allez'],
-        correctAnswer: 0,
+        options: ['S\'il vous plaît, sortez', 'S\'il vous plaît, attendez', 'S\'il vous plaît, entrez', 'S\'il vous plaît, allez'],
+        correctAnswer: 2,
         explanation: '请进 (qǐng jìn) = S\'il vous plaît, entrez'
       }
     ]
@@ -103,8 +103,8 @@ export const exerciseData: Record<string, Exercise> = {
       },
       {
         question: 'Traduisez : "对什么感兴趣"',
-        options: ['Être intéressé par quelque chose', 'Ne pas être intéressé', 'Demander un intérêt', 'Avoir un intérêt'],
-        correctAnswer: 0,
+        options: ['Ne pas être intéressé', 'Demander un intérêt', 'Être intéressé par quelque chose', 'Avoir un intérêt'],
+        correctAnswer: 2,
         explanation: '对...感兴趣 (duì...gǎn xìngqù) = être intéressé par...'
       }
     ]
@@ -380,8 +380,8 @@ export const exerciseData: Record<string, Exercise> = {
       {
         question: 'Comment dire "faire du sport" ?',
         chinese: '做运动',
-        options: ['做运动 (zuò yùndòng)', '去运动 (qù yùndòng)', '来运动 (lái yùndòng)', '看运动 (kàn yùndòng)'],
-        correctAnswer: 0,
+        options: ['去运动 (qù yùndòng)', '来运动 (lái yùndòng)', '看运动 (kàn yùndòng)', '做运动 (zuò yùndòng)'],
+        correctAnswer: 3,
         explanation: '做运动 (zuò yùndòng) = faire du sport'
       }
     ]
@@ -482,16 +482,301 @@ export const exerciseData: Record<string, Exercise> = {
       {
         question: 'Comment dire "s\'amuser" ou "avoir du plaisir" ?',
         chinese: '玩儿',
-        options: ['玩儿 (wánr)', '工作 (gōngzuò)', '学习 (xuéxí)', '吃饭 (chīfàn)'],
-        correctAnswer: 0,
+        options: ['工作 (gōngzuò)', '学习 (xuéxí)', '吃饭 (chīfàn)', '玩儿 (wánr)'],
+        correctAnswer: 3,
         explanation: '玩儿 (wánr) = s\'amuser, avoir du plaisir'
       },
       {
         question: 'Comment dire "Je vais m\'amuser" ?',
         chinese: '我去玩儿',
-        options: ['我去玩儿 (wǒ qù wánr)', '我来玩儿 (wǒ lái wánr)', '我看玩儿 (wǒ kàn wánr)', '我做玩儿 (wǒ zuò wánr)'],
-        correctAnswer: 0,
+        options: ['我来玩儿 (wǒ lái wánr)', '我看玩儿 (wǒ kàn wánr)', '我做玩儿 (wǒ zuò wánr)', '我去玩儿 (wǒ qù wánr)'],
+        correctAnswer: 3,
         explanation: '我去玩儿 (wǒ qù wánr) = Je vais m\'amuser'
+      }
+    ]
+  },
+
+  // Classificateurs - Partie 1 : Les plus courants
+  'classificateurs-1': {
+    id: 'classificateurs-1',
+    title: 'Classificateurs (量词) - Partie 1 : Les plus courants',
+    type: 'multiple-choice',
+    questions: [
+      {
+        question: 'Quel classificateur utilise-t-on pour "书" (livre) ?',
+        options: ['张 (zhāng)', '支 (zhī)', '本 (běn)', '个 (gè)'],
+        correctAnswer: 2,
+        explanation: '本 (běn) est utilisé pour les livres, magazines, cahiers et autres objets reliés. C\'est parce que 本 signifie à l\'origine "racine" ou "base", et les livres sont considérés comme des objets avec une "base" solide. Exemple : 一本书 (yì běn shū) = un livre.'
+      },
+      {
+        question: 'Quel classificateur utilise-t-on pour "纸" (papier) ?',
+        options: ['片 (piàn)', '个 (gè)', '本 (běn)', '张 (zhāng)'],
+        correctAnswer: 3,
+        explanation: '张 (zhāng) est utilisé pour les objets plats et rectangulaires comme le papier, les tables, les photos, les cartes, les lits. 张 signifie à l\'origine "étendre", donc il s\'applique aux objets qui peuvent être "étendus". Exemple : 一张纸 (yì zhāng zhǐ) = une feuille de papier.'
+      },
+      {
+        question: 'Quel classificateur utilise-t-on pour "人" (personne) ?',
+        options: ['位 (wèi)', '名 (míng)', '张 (zhāng)', '个 (gè)'],
+        correctAnswer: 3,
+        explanation: '个 (gè) est le classificateur le plus général et polyvalent. Il peut être utilisé pour presque tout, y compris les personnes. C\'est le classificateur "par défaut" quand on ne sait pas lequel utiliser. Exemple : 一个人 (yí gè rén) = une personne. Note : 位 (wèi) est plus poli pour les personnes, mais 个 est plus courant.'
+      },
+      {
+        question: 'Quel classificateur utilise-t-on pour "水" (eau) dans un verre ?',
+        options: ['瓶 (píng)', '碗 (wǎn)', '杯 (bēi)', '个 (gè)'],
+        correctAnswer: 2,
+        explanation: '杯 (bēi) signifie "tasse" ou "verre", donc il est utilisé pour les boissons servies dans une tasse ou un verre. Exemple : 一杯水 (yì bēi shuǐ) = un verre d\'eau. Note : 瓶 (píng) = bouteille, 碗 (wǎn) = bol.'
+      },
+      {
+        question: 'Quel classificateur utilise-t-on pour "衣服" (vêtement) ?',
+        options: ['套 (tào)', '条 (tiáo)', '件 (jiàn)', '个 (gè)'],
+        correctAnswer: 2,
+        explanation: '件 (jiàn) est utilisé pour les vêtements individuels (chemises, manteaux, etc.) et les choses abstraites ou concrètes qui sont "complètes" en elles-mêmes. 件 signifie "pièce" ou "article". Exemple : 一件衣服 (yí jiàn yīfu) = un vêtement.'
+      },
+      {
+        question: 'Quel classificateur utilise-t-on pour "鱼" (poisson) ?',
+        options: ['只 (zhī)', '头 (tóu)', '条 (tiáo)', '个 (gè)'],
+        correctAnswer: 2,
+        explanation: '条 (tiáo) est utilisé pour les objets longs et flexibles : poissons, pantalons, routes, rivières, serpents, etc. 条 signifie à l\'origine "bande" ou "lanière". Exemple : 一条鱼 (yì tiáo yú) = un poisson.'
+      },
+      {
+        question: 'Quel classificateur utilise-t-on pour "车" (voiture) ?',
+        options: ['台 (tái)', '部 (bù)', '辆 (liàng)', '个 (gè)'],
+        correctAnswer: 2,
+        explanation: '辆 (liàng) est spécifiquement utilisé pour les véhicules à roues : voitures, vélos, motos, bus, etc. C\'est un classificateur spécialisé pour les moyens de transport terrestres. Exemple : 一辆车 (yí liàng chē) = une voiture.'
+      },
+      {
+        question: 'Quel classificateur utilise-t-on pour "笔" (stylo) ?',
+        options: ['根 (gēn)', '条 (tiáo)', '支 (zhī)', '个 (gè)'],
+        correctAnswer: 2,
+        explanation: '支 (zhī) est utilisé pour les objets longs, fins et rigides : stylos, cigarettes, flûtes, bougies, etc. 支 signifie "branche" ou "tige". Exemple : 一支笔 (yì zhī bǐ) = un stylo.'
+      }
+    ]
+  },
+
+  // Classificateurs - Partie 2 : Animaux et objets spécifiques
+  'classificateurs-2': {
+    id: 'classificateurs-2',
+    title: 'Classificateurs (量词) - Partie 2 : Animaux et objets spécifiques',
+    type: 'multiple-choice',
+    questions: [
+      {
+        question: 'Quel classificateur utilise-t-on pour "猫" (chat) ?',
+        options: ['头 (tóu)', '条 (tiáo)', '只 (zhī)', '个 (gè)'],
+        correctAnswer: 2,
+        explanation: '只 (zhī) est utilisé pour la plupart des animaux de petite et moyenne taille : chats, chiens, oiseaux, lapins, etc. C\'est le classificateur standard pour les animaux. Exemple : 一只猫 (yì zhī māo) = un chat.'
+      },
+      {
+        question: 'Quel classificateur utilise-t-on pour "牛" (vache) ?',
+        options: ['只 (zhī)', '头 (tóu)', '匹 (pǐ)', '个 (gè)'],
+        correctAnswer: 1,
+        explanation: '头 (tóu) signifie "tête" et est utilisé pour les gros animaux domestiques : vaches, porcs, moutons, éléphants. Ces animaux sont comptés par leur "tête". Exemple : 一头牛 (yì tóu niú) = une vache.'
+      },
+      {
+        question: 'Quel classificateur utilise-t-on pour "马" (cheval) ?',
+        options: ['头 (tóu)', '个 (gè)', '只 (zhī)', '匹 (pǐ)'],
+        correctAnswer: 3,
+        explanation: '匹 (pǐ) est spécifiquement utilisé pour les chevaux. C\'est un classificateur ancien et spécialisé. Exemple : 一匹马 (yì pǐ mǎ) = un cheval.'
+      },
+      {
+        question: 'Quel classificateur utilise-t-on pour "树" (arbre) ?',
+        options: ['株 (zhū)', '根 (gēn)', '棵 (kē)', '个 (gè)'],
+        correctAnswer: 2,
+        explanation: '棵 (kē) est utilisé pour les arbres et les plantes en général. C\'est le classificateur standard pour la végétation. Exemple : 一棵树 (yì kē shù) = un arbre.'
+      },
+      {
+        question: 'Quel classificateur utilise-t-on pour "山" (montagne) ?',
+        options: ['条 (tiáo)', '峰 (fēng)', '座 (zuò)', '个 (gè)'],
+        correctAnswer: 2,
+        explanation: '座 (zuò) est utilisé pour les objets grands, solides et fixes : montagnes, bâtiments, ponts, statues. 座 signifie "siège" ou "base", donc il s\'applique aux structures imposantes. Exemple : 一座山 (yí zuò shān) = une montagne.'
+      },
+      {
+        question: 'Quel classificateur utilise-t-on pour "鞋" (chaussure) en paire ?',
+        options: ['只 (zhī)', '对 (duì)', '双 (shuāng)', '个 (gè)'],
+        correctAnswer: 2,
+        explanation: '双 (shuāng) signifie "paire" et est utilisé pour les objets qui vont par deux : chaussures, gants, chaussettes, lunettes. Exemple : 一双鞋 (yì shuāng xié) = une paire de chaussures. Note : 只 (zhī) peut être utilisé pour une seule chaussure : 一只鞋.'
+      },
+      {
+        question: 'Quel classificateur utilise-t-on pour "椅子" (chaise) ?',
+        options: ['张 (zhāng)', '座 (zuò)', '把 (bǎ)', '个 (gè)'],
+        correctAnswer: 2,
+        explanation: '把 (bǎ) signifie "poignée" et est utilisé pour les objets avec une poignée : chaises, parapluies, couteaux, clés, brosses. Exemple : 一把椅子 (yì bǎ yǐzi) = une chaise.'
+      },
+      {
+        question: 'Quel classificateur utilise-t-on pour "电脑" (ordinateur) ?',
+        options: ['部 (bù)', '架 (jià)', '台 (tái)', '个 (gè)'],
+        correctAnswer: 2,
+        explanation: '台 (tái) signifie "plateforme" ou "support" et est utilisé pour les machines et appareils : ordinateurs, télévisions, machines à laver, etc. Exemple : 一台电脑 (yì tái diànnǎo) = un ordinateur.'
+      }
+    ]
+  },
+
+  // Classificateurs - Partie 3 : Objets abstraits et cas spéciaux
+  'classificateurs-3': {
+    id: 'classificateurs-3',
+    title: 'Classificateurs (量词) - Partie 3 : Objets abstraits et cas spéciaux',
+    type: 'multiple-choice',
+    questions: [
+      {
+        question: 'Quel classificateur utilise-t-on pour "钱" (argent) en pièces ?',
+        options: ['元 (yuán)', '块 (kuài)', '张 (zhāng)', '个 (gè)'],
+        correctAnswer: 1,
+        explanation: '块 (kuài) signifie "morceau" et est utilisé pour : 1) les pièces de monnaie (一块钱 = un yuan), 2) les morceaux de quelque chose (一块蛋糕 = un morceau de gâteau), 3) les terrains (一块地). Exemple : 一块钱 (yí kuài qián) = un yuan (pièce).'
+      },
+      {
+        question: 'Quel classificateur utilise-t-on pour "电影" (film) ?',
+        options: ['场 (chǎng)', '集 (jí)', '部 (bù)', '个 (gè)'],
+        correctAnswer: 2,
+        explanation: '部 (bù) est utilisé pour les œuvres complètes : films, romans, séries télévisées, machines. 部 signifie "partie" ou "section". Exemple : 一部电影 (yí bù diànyǐng) = un film.'
+      },
+      {
+        question: 'Quel classificateur utilise-t-on pour "课" (cours) ?',
+        options: ['堂 (táng)', '门 (mén)', '节 (jié)', '个 (gè)'],
+        correctAnswer: 2,
+        explanation: '节 (jié) signifie "section" ou "segment" et est utilisé pour les cours, les leçons, les chapitres. Exemple : 一节课 (yì jié kè) = un cours. Note : 门 (mén) est utilisé pour une matière complète : 一门课 = une matière.'
+      },
+      {
+        question: 'Quel classificateur utilise-t-on pour "事情" (chose, affaire) ?',
+        options: ['桩 (zhuāng)', '项 (xiàng)', '件 (jiàn)', '个 (gè)'],
+        correctAnswer: 2,
+        explanation: '件 (jiàn) est utilisé pour les choses abstraites ou concrètes qui sont "complètes" : affaires, événements, vêtements. Exemple : 一件事情 (yí jiàn shìqing) = une affaire/une chose.'
+      },
+      {
+        question: 'Quel classificateur utilise-t-on pour "门" (porte) ?',
+        options: ['道 (dào)', '张 (zhāng)', '扇 (shàn)', '个 (gè)'],
+        correctAnswer: 2,
+        explanation: '扇 (shàn) signifie "battant" et est utilisé pour les portes et les fenêtres qui s\'ouvrent. Exemple : 一扇门 (yí shàn mén) = une porte.'
+      },
+      {
+        question: 'Quel classificateur utilise-t-on pour "花" (fleur) ?',
+        options: ['枝 (zhī)', '棵 (kē)', '朵 (duǒ)', '个 (gè)'],
+        correctAnswer: 2,
+        explanation: '朵 (duǒ) est spécifiquement utilisé pour les fleurs. C\'est un classificateur poétique et spécialisé. Exemple : 一朵花 (yì duǒ huā) = une fleur.'
+      },
+      {
+        question: 'Quel classificateur utilise-t-on pour "桥" (pont) ?',
+        options: ['条 (tiáo)', '道 (dào)', '座 (zuò)', '个 (gè)'],
+        correctAnswer: 2,
+        explanation: '座 (zuò) est utilisé pour les structures grandes et fixes : ponts, bâtiments, montagnes. Exemple : 一座桥 (yí zuò qiáo) = un pont.'
+      },
+      {
+        question: 'Quel classificateur utilise-t-on pour "裤子" (pantalon) ?',
+        options: ['件 (jiàn)', '套 (tào)', '条 (tiáo)', '个 (gè)'],
+        correctAnswer: 2,
+        explanation: '条 (tiáo) est utilisé pour les objets longs et flexibles, y compris les pantalons car ils ont des "jambes" longues. Exemple : 一条裤子 (yì tiáo kùzi) = un pantalon.'
+      }
+    ]
+  },
+
+  // Classificateurs - Partie 4 : Cas complexes et exceptions
+  'classificateurs-4': {
+    id: 'classificateurs-4',
+    title: 'Classificateurs (量词) - Partie 4 : Cas complexes et exceptions',
+    type: 'multiple-choice',
+    questions: [
+      {
+        question: 'Quel classificateur utilise-t-on pour "老师" (professeur) de manière polie ?',
+        options: ['名 (míng)', '位 (wèi)', '员 (yuán)', '个 (gè)'],
+        correctAnswer: 1,
+        explanation: '位 (wèi) est la forme polie pour compter les personnes. Il montre du respect. 个 (gè) est neutre, tandis que 位 est plus formel et respectueux. Exemple : 一位老师 (yí wèi lǎoshī) = un professeur (poli).'
+      },
+      {
+        question: 'Quel classificateur utilise-t-on pour "学生" (étudiant) de manière formelle ?',
+        options: ['位 (wèi)', '员 (yuán)', '名 (míng)', '个 (gè)'],
+        correctAnswer: 2,
+        explanation: '名 (míng) signifie "nom" et est utilisé de manière formelle pour compter les personnes dans des contextes officiels : étudiants, employés, membres. Exemple : 一名学生 (yì míng xuésheng) = un étudiant (formel).'
+      },
+      {
+        question: 'Quel classificateur utilise-t-on pour "照片" (photo) ?',
+        options: ['幅 (fú)', '片 (piàn)', '张 (zhāng)', '个 (gè)'],
+        correctAnswer: 2,
+        explanation: '张 (zhāng) est utilisé pour les objets plats : photos, cartes, tables, lits. Les photos sont plates et rectangulaires, donc 张 est approprié. Exemple : 一张照片 (yì zhāng zhàopiàn) = une photo.'
+      },
+      {
+        question: 'Quel classificateur utilise-t-on pour "画" (tableau, peinture) ?',
+        options: ['张 (zhāng)', '件 (jiàn)', '幅 (fú)', '个 (gè)'],
+        correctAnswer: 2,
+        explanation: '幅 (fú) est spécifiquement utilisé pour les peintures, tableaux et œuvres d\'art accrochées. C\'est plus spécialisé que 张. Exemple : 一幅画 (yì fú huà) = un tableau.'
+      },
+      {
+        question: 'Quel classificateur utilise-t-on pour "房子" (maison) ?',
+        options: ['间 (jiān)', '栋 (dòng)', '座 (zuò)', '个 (gè)'],
+        correctAnswer: 2,
+        explanation: '座 (zuò) est utilisé pour les bâtiments complets : maisons, immeubles, palais. 间 (jiān) est utilisé pour les pièces à l\'intérieur. Exemple : 一座房子 (yí zuò fángzi) = une maison.'
+      },
+      {
+        question: 'Quel classificateur utilise-t-on pour "房间" (chambre, pièce) ?',
+        options: ['座 (zuò)', '套 (tào)', '间 (jiān)', '个 (gè)'],
+        correctAnswer: 2,
+        explanation: '间 (jiān) signifie "espace entre" et est utilisé pour les pièces, chambres, salles. C\'est le classificateur pour les espaces intérieurs. Exemple : 一间房间 (yì jiān fángjiān) = une chambre.'
+      },
+      {
+        question: 'Quel classificateur utilise-t-on pour "飞机" (avion) ?',
+        options: ['台 (tái)', '辆 (liàng)', '架 (jià)', '个 (gè)'],
+        correctAnswer: 2,
+        explanation: '架 (jià) signifie "support" ou "cadre" et est utilisé pour les avions, hélicoptères, et autres aéronefs. Exemple : 一架飞机 (yí jià fēijī) = un avion.'
+      },
+      {
+        question: 'Quel classificateur utilise-t-on pour "船" (bateau) ?',
+        options: ['条 (tiáo)', '只 (zhī)', '艘 (sōu)', '个 (gè)'],
+        correctAnswer: 2,
+        explanation: '艘 (sōu) est spécifiquement utilisé pour les bateaux et navires. C\'est un classificateur spécialisé pour les embarcations. Exemple : 一艘船 (yì sōu chuán) = un bateau.'
+      }
+    ]
+  },
+
+  // Classificateurs - Partie 5 : Pratique avancée
+  'classificateurs-5': {
+    id: 'classificateurs-5',
+    title: 'Classificateurs (量词) - Partie 5 : Pratique avancée',
+    type: 'multiple-choice',
+    questions: [
+      {
+        question: 'Quel classificateur utilise-t-on pour "苹果" (pomme) ?',
+        options: ['颗 (kē)', '粒 (lì)', '只 (zhī)', '个 (gè)'],
+        correctAnswer: 3,
+        explanation: '个 (gè) est le classificateur le plus général et peut être utilisé pour les fruits ronds. Cependant, 颗 (kē) est aussi utilisé pour les petits objets ronds comme les perles, les grains. Pour les pommes, 个 est le plus courant. Exemple : 一个苹果 (yí gè píngguǒ) = une pomme.'
+      },
+      {
+        question: 'Quel classificateur utilise-t-on pour "米" (riz, grain) ?',
+        options: ['颗 (kē)', '只 (zhī)', '粒 (lì)', '个 (gè)'],
+        correctAnswer: 2,
+        explanation: '粒 (lì) signifie "grain" et est utilisé pour les petits objets ronds et durs : grains de riz, perles, pilules. Exemple : 一粒米 (yí lì mǐ) = un grain de riz.'
+      },
+      {
+        question: 'Quel classificateur utilise-t-on pour "眼镜" (lunettes) ?',
+        options: ['双 (shuāng)', '对 (duì)', '副 (fù)', '个 (gè)'],
+        correctAnswer: 2,
+        explanation: '副 (fù) signifie "paire" ou "jeu" et est utilisé pour les objets qui vont ensemble : lunettes, cartes à jouer, échecs. Exemple : 一副眼镜 (yí fù yǎnjìng) = une paire de lunettes.'
+      },
+      {
+        question: 'Quel classificateur utilise-t-on pour "筷子" (baguettes) ?',
+        options: ['根 (gēn)', '支 (zhī)', '双 (shuāng)', '个 (gè)'],
+        correctAnswer: 2,
+        explanation: '双 (shuāng) signifie "paire" et est utilisé pour les baguettes car elles sont utilisées par deux. Exemple : 一双筷子 (yì shuāng kuàizi) = une paire de baguettes.'
+      },
+      {
+        question: 'Quel classificateur utilise-t-on pour "头发" (cheveu) ?',
+        options: ['条 (tiáo)', '丝 (sī)', '根 (gēn)', '个 (gè)'],
+        correctAnswer: 2,
+        explanation: '根 (gēn) signifie "racine" et est utilisé pour les objets longs et fins : cheveux, fils, cordes, bâtons. Exemple : 一根头发 (yì gēn tóufa) = un cheveu.'
+      },
+      {
+        question: 'Quel classificateur utilise-t-on pour "灯" (lampe) ?',
+        options: ['台 (tái)', '支 (zhī)', '盏 (zhǎn)', '个 (gè)'],
+        correctAnswer: 2,
+        explanation: '盏 (zhǎn) est spécifiquement utilisé pour les lampes et les lanternes. C\'est un classificateur ancien et spécialisé. Exemple : 一盏灯 (yì zhǎn dēng) = une lampe.'
+      },
+      {
+        question: 'Quel classificateur utilise-t-on pour "衣服" (vêtement) en ensemble ?',
+        options: ['件 (jiàn)', '身 (shēn)', '套 (tào)', '个 (gè)'],
+        correctAnswer: 2,
+        explanation: '套 (tào) signifie "ensemble" ou "série" et est utilisé pour les vêtements complets (haut + bas), les meubles en ensemble, les livres en série. Exemple : 一套衣服 (yí tào yīfu) = un ensemble de vêtements.'
+      },
+      {
+        question: 'Quel classificateur utilise-t-on pour "问题" (question, problème) ?',
+        options: ['件 (jiàn)', '项 (xiàng)', '个 (gè)', '道 (dào)'],
+        correctAnswer: 2,
+        explanation: '个 (gè) est le classificateur le plus général et peut être utilisé pour les questions et problèmes. 道 (dào) est aussi utilisé pour les questions dans certains contextes formels. Exemple : 一个问题 (yí gè wèntí) = une question.'
       }
     ]
   }
@@ -621,6 +906,42 @@ export const exerciseCategories: ExerciseCategory[] = [
         title: 'Numéro de téléphone',
         type: 'text-input',
         description: 'Demander avec 号码 et 多少'
+      }
+    ]
+  },
+  {
+    id: 'classificateurs',
+    title: 'Classificateurs (量词)',
+    exercises: [
+      {
+        id: 'classificateurs-1',
+        title: 'Classificateurs - Partie 1',
+        type: 'multiple-choice',
+        description: 'Les plus courants : 个, 本, 张, 杯, 件, 条, 辆, 支'
+      },
+      {
+        id: 'classificateurs-2',
+        title: 'Classificateurs - Partie 2',
+        type: 'multiple-choice',
+        description: 'Animaux et objets spécifiques : 只, 头, 匹, 棵, 座, 双, 把, 台'
+      },
+      {
+        id: 'classificateurs-3',
+        title: 'Classificateurs - Partie 3',
+        type: 'multiple-choice',
+        description: 'Objets abstraits et cas spéciaux : 块, 部, 节, 扇, 朵'
+      },
+      {
+        id: 'classificateurs-4',
+        title: 'Classificateurs - Partie 4',
+        type: 'multiple-choice',
+        description: 'Cas complexes et exceptions : 位, 名, 幅, 间, 架, 艘'
+      },
+      {
+        id: 'classificateurs-5',
+        title: 'Classificateurs - Partie 5',
+        type: 'multiple-choice',
+        description: 'Pratique avancée : 粒, 副, 根, 盏, 套'
       }
     ]
   }
