@@ -70,25 +70,40 @@ export default function FillInBlanksExercise({ sentences, wordBank, onComplete, 
   const handleWordSelect = (blankId: string, wordId: string) => {
     if (submitted) return
 
-    // Libérer le mot précédemment utilisé par ce blank
-    if (selectedWords[blankId]) {
-      const newUsed = new Set(Array.from(usedWords).filter(id => id !== selectedWords[blankId]))
+    // Si le mot est déjà sélectionné pour ce blank, on le désélectionne
+    if (selectedWords[blankId] === wordId) {
+      const newSelected = { ...selectedWords }
+      delete newSelected[blankId]
+      setSelectedWords(newSelected)
+      // Retirer le mot de la liste des mots utilisés
+      const newUsed = new Set(Array.from(usedWords).filter(id => id !== wordId))
       setUsedWords(newUsed)
+      return
+    }
+
+    // Calculer les nouveaux états de manière atomique
+    const newSelected = { ...selectedWords }
+    const newUsed = new Set(Array.from(usedWords))
+
+    // Libérer le mot précédemment utilisé par ce blank
+    const previousWord = selectedWords[blankId]
+    if (previousWord) {
+      newUsed.delete(previousWord)
     }
 
     // Libérer le blank qui utilisait ce mot
     const currentBlank = Object.keys(selectedWords).find(b => selectedWords[b] === wordId)
     if (currentBlank && currentBlank !== blankId) {
-      const newSelected = { ...selectedWords }
       delete newSelected[currentBlank]
-      setSelectedWords(newSelected)
-      const newUsed = new Set(Array.from(usedWords).filter(id => id !== wordId))
-      setUsedWords(newUsed)
+      newUsed.delete(wordId)
     }
 
     // Assigner le nouveau mot
-    setSelectedWords({ ...selectedWords, [blankId]: wordId })
-    setUsedWords(new Set([...Array.from(usedWords), wordId]))
+    newSelected[blankId] = wordId
+    newUsed.add(wordId)
+    
+    setSelectedWords(newSelected)
+    setUsedWords(newUsed)
   }
 
   const handleSubmit = () => {

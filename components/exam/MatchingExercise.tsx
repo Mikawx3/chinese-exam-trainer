@@ -70,6 +70,27 @@ export default function MatchingExercise({ leftItems, rightItems, correctPairs, 
 
   const handleRightClick = (rightId: string) => {
     if (submitted || !selectedLeft) return
+    
+    // Si on clique sur un élément de droite déjà apparié avec l'élément de gauche sélectionné, on désélectionne
+    if (pairs[selectedLeft] === rightId) {
+      const newPairs = { ...pairs }
+      delete newPairs[selectedLeft]
+      setPairs(newPairs)
+      setSelectedLeft(null)
+      return
+    }
+    
+    // Si on clique sur un élément de droite déjà apparié avec un autre élément de gauche, on libère l'ancien appariement
+    const currentLeft = Object.keys(pairs).find(leftId => pairs[leftId] === rightId)
+    if (currentLeft && currentLeft !== selectedLeft) {
+      const newPairs = { ...pairs }
+      delete newPairs[currentLeft]
+      newPairs[selectedLeft] = rightId
+      setPairs(newPairs)
+      setSelectedLeft(null)
+      return
+    }
+    
     setPairs({ ...pairs, [selectedLeft]: rightId })
     setSelectedLeft(null)
   }

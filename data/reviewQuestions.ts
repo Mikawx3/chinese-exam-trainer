@@ -581,8 +581,8 @@ export const reviewQuestions: ReviewQuestion[] = [
     number: 72,
     question: '上课的时候，谁看手机？',
     pinyin: 'shàngkè de shíhòu, shuí kàn shǒujī',
-    correctAnswer: '学生看手机。',
-    correctPinyin: 'xuéshēng kàn shǒujī.'
+    correctAnswer: '上课的时候，学生看手机。',
+    correctPinyin: 'shàngkè de shíhòu, xuéshēng kàn shǒujī.'
   },
   {
     id: 'q73',

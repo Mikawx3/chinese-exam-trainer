@@ -69,23 +69,40 @@ export default function VerbObjectExercise({ verbs, objects, correctPairs, onCom
   const handleObjectSelect = (verbId: string, objectId: string) => {
     if (submitted) return
     
+    // Si l'objet est déjà sélectionné pour ce verbe, on le désélectionne
+    if (selectedObjects[verbId] === objectId) {
+      const newSelected = { ...selectedObjects }
+      delete newSelected[verbId]
+      setSelectedObjects(newSelected)
+      // Retirer l'objet de la liste des objets utilisés
+      const newUsed = new Set(Array.from(usedObjects).filter(id => id !== objectId))
+      setUsedObjects(newUsed)
+      return
+    }
+    
+    // Calculer les nouveaux états de manière atomique
+    const newSelected = { ...selectedObjects }
+    const newUsed = new Set(Array.from(usedObjects))
+    
     // Si l'objet est déjà utilisé par un autre verbe, le libérer
     const currentUser = Object.keys(selectedObjects).find(v => selectedObjects[v] === objectId)
     if (currentUser && currentUser !== verbId) {
-      const newSelected = { ...selectedObjects }
       delete newSelected[currentUser]
-      setSelectedObjects(newSelected)
-      setUsedObjects(new Set(Array.from(usedObjects).filter(id => id !== objectId)))
+      newUsed.delete(objectId)
     }
 
     // Si ce verbe avait déjà un objet, le libérer
-    if (selectedObjects[verbId]) {
-      setUsedObjects(new Set(Array.from(usedObjects).filter(id => id !== selectedObjects[verbId])))
+    const previousObject = selectedObjects[verbId]
+    if (previousObject) {
+      newUsed.delete(previousObject)
     }
 
     // Assigner le nouvel objet
-    setSelectedObjects({ ...selectedObjects, [verbId]: objectId })
-    setUsedObjects(new Set([...Array.from(usedObjects), objectId]))
+    newSelected[verbId] = objectId
+    newUsed.add(objectId)
+    
+    setSelectedObjects(newSelected)
+    setUsedObjects(newUsed)
   }
 
   const handleSubmit = () => {
