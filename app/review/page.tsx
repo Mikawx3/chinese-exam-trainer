@@ -1,17 +1,31 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { reviewQuestions } from '@/data/reviewQuestions'
 
+// Fonction pour mélanger un tableau de manière aléatoire (algorithme Fisher-Yates)
+function shuffleArray<T>(array: T[]): T[] {
+  const shuffled = [...array]
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+  }
+  return shuffled
+}
+
 export default function ReviewPage() {
   const router = useRouter()
+  
+  // Mélanger les questions une seule fois au chargement du composant
+  const shuffledQuestions = useMemo(() => shuffleArray(reviewQuestions), [])
+  
   const [currentIndex, setCurrentIndex] = useState(0)
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [checkedAnswers, setCheckedAnswers] = useState<Record<string, boolean>>({})
   const [showCorrectAnswer, setShowCorrectAnswer] = useState<Record<string, boolean>>({})
 
-  const currentQuestion = reviewQuestions[currentIndex]
+  const currentQuestion = shuffledQuestions[currentIndex]
   const userAnswer = answers[currentQuestion.id] || ''
   const isChecked = checkedAnswers[currentQuestion.id] || false
   const isCorrect = showCorrectAnswer[currentQuestion.id] || false
@@ -110,7 +124,7 @@ export default function ReviewPage() {
   }
 
   const handleNext = () => {
-    if (currentIndex < reviewQuestions.length - 1) {
+    if (currentIndex < shuffledQuestions.length - 1) {
       setCurrentIndex(currentIndex + 1)
     }
   }
@@ -121,7 +135,7 @@ export default function ReviewPage() {
     }
   }
 
-  const progress = ((currentIndex + 1) / reviewQuestions.length) * 100
+  const progress = ((currentIndex + 1) / shuffledQuestions.length) * 100
   const answeredCount = Object.keys(answers).filter(id => answers[id]?.trim().length > 0).length
   const correctCount = Object.values(showCorrectAnswer).filter(v => v === true).length
 
@@ -144,7 +158,7 @@ export default function ReviewPage() {
           marginBottom: '10px'
         }}>
           <div style={{ fontSize: '1.1em', fontWeight: 'bold', color: '#667eea' }}>
-            Question {currentIndex + 1} / {reviewQuestions.length}
+            Question {currentIndex + 1} / {shuffledQuestions.length}
           </div>
           <div style={{ fontSize: '0.9em', color: '#666' }}>
             ✓ Correctes: {correctCount} | Répondues: {answeredCount}
@@ -356,10 +370,10 @@ export default function ReviewPage() {
         <button
           className="btn btn-secondary"
           onClick={handleNext}
-          disabled={currentIndex === reviewQuestions.length - 1}
+          disabled={currentIndex === shuffledQuestions.length - 1}
           style={{
-            opacity: currentIndex === reviewQuestions.length - 1 ? 0.5 : 1,
-            cursor: currentIndex === reviewQuestions.length - 1 ? 'not-allowed' : 'pointer'
+            opacity: currentIndex === shuffledQuestions.length - 1 ? 0.5 : 1,
+            cursor: currentIndex === shuffledQuestions.length - 1 ? 'not-allowed' : 'pointer'
           }}
         >
           下一题 (Question suivante) →
