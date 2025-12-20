@@ -30,27 +30,11 @@ export default function ReviewPage() {
   // Charger les données depuis localStorage au démarrage
   const [loaded, setLoaded] = useState(false)
   const [showOnlyMarked, setShowOnlyMarked] = useState(false)
+  const [showOnlyFailed, setShowOnlyFailed] = useState(false)
   
-  // Charger l'ordre mélangé sauvegardé ou créer un nouvel ordre
-  const shuffledQuestions = useMemo(() => {
-    if (typeof window === 'undefined') return reviewQuestions
-    
-    const savedOrder = localStorage.getItem(STORAGE_KEYS.shuffledOrder)
-    if (savedOrder) {
-      try {
-        const order = JSON.parse(savedOrder) as string[]
-        // Reconstruire l'ordre à partir des IDs sauvegardés
-        return order.map(id => reviewQuestions.find(q => q.id === id)!).filter(Boolean)
-      } catch (e) {
-        console.error('Error loading saved order:', e)
-      }
-    }
-    
-    // Créer un nouvel ordre et le sauvegarder
-    const shuffled = shuffleArray(reviewQuestions)
-    localStorage.setItem(STORAGE_KEYS.shuffledOrder, JSON.stringify(shuffled.map(q => q.id)))
-    return shuffled
-  }, [])
+  // Utiliser un état pour les questions mélangées au lieu d'un useMemo
+  // Initialiser avec l'ordre original pour éviter les erreurs d'hydratation
+  const [shuffledQuestions, setShuffledQuestions] = useState(reviewQuestions)
   
   const [currentIndex, setCurrentIndex] = useState(0)
   const [answers, setAnswers] = useState<Record<string, string>>({})
@@ -58,11 +42,35 @@ export default function ReviewPage() {
   const [showCorrectAnswer, setShowCorrectAnswer] = useState<Record<string, boolean>>({})
   const [markedQuestions, setMarkedQuestions] = useState<Set<string>>(new Set())
   
-  // Charger les données depuis localStorage au montage
+  // Charger l'ordre mélangé et les données depuis localStorage au montage (côté client uniquement)
   useEffect(() => {
     if (typeof window === 'undefined') return
     
     try {
+      // Charger l'ordre mélangé sauvegardé ou créer un nouvel ordre
+      const savedOrder = localStorage.getItem(STORAGE_KEYS.shuffledOrder)
+      let questions = reviewQuestions
+      
+      if (savedOrder) {
+        try {
+          const order = JSON.parse(savedOrder) as string[]
+          // Reconstruire l'ordre à partir des IDs sauvegardés
+          questions = order.map(id => reviewQuestions.find(q => q.id === id)!).filter(Boolean)
+        } catch (e) {
+          console.error('Error loading saved order:', e)
+        }
+      }
+      
+      // Si aucun ordre sauvegardé, créer un nouvel ordre et le sauvegarder
+      if (!savedOrder) {
+        questions = shuffleArray(reviewQuestions)
+        localStorage.setItem(STORAGE_KEYS.shuffledOrder, JSON.stringify(questions.map(q => q.id)))
+      }
+      
+      // Mettre à jour l'état avec les questions mélangées
+      setShuffledQuestions(questions)
+      
+      // Charger les autres données
       const savedAnswers = localStorage.getItem(STORAGE_KEYS.answers)
       const savedChecked = localStorage.getItem(STORAGE_KEYS.checkedAnswers)
       const savedCorrect = localStorage.getItem(STORAGE_KEYS.correctAnswers)
@@ -74,7 +82,13 @@ export default function ReviewPage() {
       if (savedChecked) setCheckedAnswers(JSON.parse(savedChecked))
       if (savedCorrect) setShowCorrectAnswer(JSON.parse(savedCorrect))
       if (savedMarked) setMarkedQuestions(new Set(JSON.parse(savedMarked)))
-      if (savedIndex) setCurrentIndex(parseInt(savedIndex, 10))
+      if (savedIndex) {
+        const index = parseInt(savedIndex, 10)
+        // S'assurer que l'index est valide par rapport aux questions chargées
+        if (index >= 0 && index < questions.length) {
+          setCurrentIndex(index)
+        }
+      }
       if (savedShowOnlyMarked) setShowOnlyMarked(savedShowOnlyMarked === 'true')
     } catch (e) {
       console.error('Error loading from localStorage:', e)
@@ -100,18 +114,51 @@ export default function ReviewPage() {
   
   // Filtrer les questions selon le mode
   const filteredQuestions = useMemo(() => {
+    let filtered = shuffledQuestions
+    
     if (showOnlyMarked) {
-      return shuffledQuestions.filter(q => markedQuestions.has(q.id))
+      filtered = filtered.filter(q => markedQuestions.has(q.id))
     }
-    return shuffledQuestions
-  }, [shuffledQuestions, showOnlyMarked, markedQuestions])
+    
+    if (showOnlyFailed) {
+      filtered = filtered.filter(q => {
+        // Une question est échouée si elle a été vérifiée ET la réponse était incorrecte
+        return checkedAnswers[q.id] === true && showCorrectAnswer[q.id] === false
+      })
+    }
+    
+    return filtered
+  }, [shuffledQuestions, showOnlyMarked, markedQuestions, showOnlyFailed, checkedAnswers, showCorrectAnswer])
   
   // Ajuster l'index si nécessaire après filtrage
   useEffect(() => {
     if (filteredQuestions.length > 0 && currentIndex >= filteredQuestions.length) {
       setCurrentIndex(Math.max(0, filteredQuestions.length - 1))
+    } else if (filteredQuestions.length > 0 && currentIndex < 0) {
+      setCurrentIndex(0)
     }
   }, [filteredQuestions.length, currentIndex])
+  
+  // Réinitialiser l'index quand on change de filtre (mais pas quand on revient à la progression)
+  const [isReturningToProgress, setIsReturningToProgress] = useState(false)
+  const [savedIndexToRestore, setSavedIndexToRestore] = useState<number | null>(null)
+  
+  useEffect(() => {
+    // Si on revient à la progression et que les filtres sont désactivés, restaurer l'index
+    if (isReturningToProgress && !showOnlyMarked && !showOnlyFailed && savedIndexToRestore !== null) {
+      if (savedIndexToRestore >= 0 && savedIndexToRestore < shuffledQuestions.length) {
+        setCurrentIndex(savedIndexToRestore)
+      }
+      setIsReturningToProgress(false)
+      setSavedIndexToRestore(null)
+      return
+    }
+    
+    // Sinon, réinitialiser l'index à 0 quand on change de filtre
+    if (!isReturningToProgress && filteredQuestions.length > 0) {
+      setCurrentIndex(0)
+    }
+  }, [showOnlyMarked, showOnlyFailed, isReturningToProgress, filteredQuestions.length, savedIndexToRestore, shuffledQuestions.length])
 
   const currentQuestion = filteredQuestions[currentIndex]
   if (!currentQuestion) {
@@ -122,7 +169,9 @@ export default function ReviewPage() {
         </button>
         <h1>复习问题 - 根据回答写问题</h1>
         <p style={{ marginBottom: '30px', textAlign: 'center', color: '#666' }}>
-          {showOnlyMarked ? 'Aucune question marquée pour le moment.' : 'Chargement...'}
+          {showOnlyMarked && filteredQuestions.length === 0 ? 'Aucune question marquée pour le moment.' : 
+           showOnlyFailed && filteredQuestions.length === 0 ? 'Aucune question échouée pour le moment.' : 
+           'Chargement...'}
         </p>
       </div>
     )
@@ -136,11 +185,11 @@ export default function ReviewPage() {
   const normalizeAnswer = (answer: string): string => {
     return answer
       .trim()
-      .toLowerCase()
       .replace(/[，。！？、]/g, '')
       .replace(/\s+/g, '')
       .replace(/吗/g, '')
       .replace(/呢/g, '')
+      .replace(/\([^)]*\)/g, '') // Supprimer les annotations entre parenthèses comme (有时候)
   }
 
   const checkAnswer = (userQuestion: string, correctQuestion: string): boolean => {
@@ -153,6 +202,37 @@ export default function ReviewPage() {
     
     // Vérification exacte
     if (normalizedUser === normalizedCorrect) {
+      return true
+    }
+    
+    // Vérification flexible : accepter les variantes d'ordre des mots temporels
+    // Par exemple : "晚上你做什么" et "你晚上做什么" sont équivalents
+    const normalizeWordOrder = (text: string): string => {
+      // Extraire les mots temporels courants
+      const timeWords = ['晚上', '早上', '中午', '下午', '平时', '周末', '现在', '今天', '明天', '昨天', '每天', '什么时候']
+      let result = text
+      
+      // Pour chaque mot temporel, vérifier s'il peut être déplacé
+      timeWords.forEach(timeWord => {
+        // Pattern: [mot temporel][sujet] ou [sujet][mot temporel]
+        const pattern1 = new RegExp(`(${timeWord})(你|我|他|她)`, 'g')
+        const pattern2 = new RegExp(`(你|我|他|她)(${timeWord})`, 'g')
+        
+        if (pattern1.test(result) || pattern2.test(result)) {
+          // Normaliser en plaçant le mot temporel au début
+          result = result.replace(pattern2, `$1$2`) // Garder l'ordre original mais normaliser
+          result = result.replace(pattern1, `$1$2`) // Garder l'ordre original mais normaliser
+        }
+      })
+      
+      return result
+    }
+    
+    // Vérification avec normalisation de l'ordre des mots
+    const normalizedUserOrder = normalizeWordOrder(normalizedUser)
+    const normalizedCorrectOrder = normalizeWordOrder(normalizedCorrect)
+    
+    if (normalizedUserOrder === normalizedCorrectOrder) {
       return true
     }
     
@@ -177,42 +257,93 @@ export default function ReviewPage() {
     const userKeyWords = removeCommonWords(normalizedUser)
     const correctKeyWords = removeCommonWords(normalizedCorrect)
     
+    // Vérification exacte après suppression des mots communs
     if (userKeyWords === correctKeyWords && userKeyWords.length > 0) {
       return true
     }
     
-    // Vérification par similarité de caractères
-    const userChars = userKeyWords.split('').filter(c => c.length > 0)
-    const correctChars = correctKeyWords.split('').filter(c => c.length > 0)
+    // Vérification spéciale pour les questions avec mots temporels : accepter les variantes d'ordre
+    // Par exemple : "晚上你做什么" et "你晚上做什么" sont équivalents
+    const timeWords = ['晚上', '早上', '中午', '下午', '平时', '周末', '现在', '今天', '明天', '昨天', '每天']
+    const hasTimeWord = timeWords.some(word => normalizedUser.includes(word) && normalizedCorrect.includes(word))
+    
+    if (hasTimeWord) {
+      // Extraire les mots-clés importants (mots temporels + verbes + mots interrogatifs)
+      const extractKeyWords = (text: string): string => {
+        const keywords: string[] = []
+        timeWords.forEach(word => {
+          if (text.includes(word)) keywords.push(word)
+        })
+        if (text.includes('做')) keywords.push('做')
+        if (text.includes('什么')) keywords.push('什么')
+        if (text.includes('怎么')) keywords.push('怎么')
+        if (text.includes('哪里')) keywords.push('哪里')
+        if (text.includes('谁')) keywords.push('谁')
+        if (text.includes('几')) keywords.push('几')
+        return keywords.sort().join('')
+      }
+      
+      const userKeywords = extractKeyWords(normalizedUser)
+      const correctKeywords = extractKeyWords(normalizedCorrect)
+      
+      // Si les mots-clés principaux correspondent (même ensemble, ordre différent accepté)
+      if (userKeywords === correctKeywords && userKeywords.length > 0) {
+        return true
+      }
+    }
+    
+    // Vérification par similarité de caractères (sans tenir compte de l'ordre)
+    const userChars = userKeyWords.split('').filter(c => c.length > 0 && c.trim() !== '')
+    const correctChars = correctKeyWords.split('').filter(c => c.length > 0 && c.trim() !== '')
     
     if (correctChars.length === 0) {
       return false
     }
     
-    let matchCount = 0
-    const userCharSet = new Set(userChars)
-    correctChars.forEach(char => {
-      if (userCharSet.has(char)) {
-        matchCount++
+    // Compter les occurrences de chaque caractère pour gérer les doublons
+    const countChars = (chars: string[]): Map<string, number> => {
+      const count = new Map<string, number>()
+      chars.forEach(char => {
+        count.set(char, (count.get(char) || 0) + 1)
+      })
+      return count
+    }
+    
+    const userCharCount = countChars(userChars)
+    const correctCharCount = countChars(correctChars)
+    
+    // Vérifier si tous les caractères de la réponse correcte sont présents dans la réponse utilisateur
+    // avec le même nombre d'occurrences
+    let allCharsMatch = true
+    const correctEntries = Array.from(correctCharCount.entries())
+    for (const [char, count] of correctEntries) {
+      if ((userCharCount.get(char) || 0) < count) {
+        allCharsMatch = false
+        break
       }
-    })
+    }
+    
+    // Vérifier aussi que le nombre total de caractères correspond (pour éviter les faux positifs)
+    if (allCharsMatch && userChars.length === correctChars.length) {
+      return true
+    }
+    
+    // Vérification par similarité (au moins 85% des caractères correspondent pour être plus strict)
+    let matchCount = 0
+    const correctEntries2 = Array.from(correctCharCount.entries())
+    for (const [char, count] of correctEntries2) {
+      const userCount = userCharCount.get(char) || 0
+      matchCount += Math.min(userCount, count)
+    }
     
     const similarity = matchCount / correctChars.length
-    return similarity >= 0.75
+    return similarity >= 0.85
   }
 
   const handleAnswerChange = (questionId: string, value: string) => {
     setAnswers({ ...answers, [questionId]: value })
-    // Réinitialiser le statut de vérification si l'utilisateur modifie sa réponse
-    if (checkedAnswers[questionId]) {
-      const newChecked = { ...checkedAnswers }
-      delete newChecked[questionId]
-      setCheckedAnswers(newChecked)
-      
-      const newShowCorrect = { ...showCorrectAnswer }
-      delete newShowCorrect[questionId]
-      setShowCorrectAnswer(newShowCorrect)
-    }
+    // Ne pas supprimer le statut de vérification pour permettre de revérifier
+    // La question reste dans la liste des échouées jusqu'à ce qu'elle soit correctement répondue
   }
 
   const handleCheck = () => {
@@ -224,6 +355,8 @@ export default function ReviewPage() {
     const correct = checkAnswer(userAnswer, currentQuestion.question)
     setCheckedAnswers({ ...checkedAnswers, [currentQuestion.id]: true })
     setShowCorrectAnswer({ ...showCorrectAnswer, [currentQuestion.id]: correct })
+    // Si la réponse est correcte, la question n'est plus échouée (showCorrectAnswer[id] = true)
+    // Si la réponse est incorrecte, la question reste échouée (showCorrectAnswer[id] = false)
   }
 
   const handleNext = () => {
@@ -242,6 +375,34 @@ export default function ReviewPage() {
     setMarkedQuestions(newMarked)
   }
   
+  const handleReturnToProgress = () => {
+    // Trouver la dernière question non répondue dans shuffledQuestions
+    let lastUnansweredIndex = -1
+    for (let i = shuffledQuestions.length - 1; i >= 0; i--) {
+      const questionId = shuffledQuestions[i].id
+      const answer = answers[questionId] || ''
+      if (!answer.trim()) {
+        lastUnansweredIndex = i
+        break
+      }
+    }
+    
+    // Si toutes les questions sont répondues, aller à la dernière question
+    if (lastUnansweredIndex === -1) {
+      lastUnansweredIndex = shuffledQuestions.length - 1
+    }
+    
+    // Sauvegarder l'index à restaurer
+    setSavedIndexToRestore(lastUnansweredIndex)
+    
+    // Marquer qu'on revient à la progression
+    setIsReturningToProgress(true)
+    
+    // Désactiver tous les filtres (l'index sera restauré par le useEffect)
+    setShowOnlyMarked(false)
+    setShowOnlyFailed(false)
+  }
+
   const handleClearProgress = () => {
     if (confirm('Êtes-vous sûr de vouloir effacer toute votre progression ?')) {
       localStorage.removeItem(STORAGE_KEYS.answers)
@@ -264,6 +425,9 @@ export default function ReviewPage() {
   const answeredCount = Object.keys(answers).filter(id => answers[id]?.trim().length > 0).length
   const correctCount = Object.values(showCorrectAnswer).filter(v => v === true).length
   const markedCount = markedQuestions.size
+  const failedCount = Object.keys(checkedAnswers).filter(id => 
+    checkedAnswers[id] === true && showCorrectAnswer[id] === false
+  ).length
 
   return (
     <div className="container">
@@ -278,7 +442,10 @@ export default function ReviewPage() {
         </p>
         <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap' }}>
           <button
-            onClick={() => setShowOnlyMarked(!showOnlyMarked)}
+            onClick={() => {
+              setShowOnlyMarked(!showOnlyMarked)
+              if (!showOnlyMarked) setShowOnlyFailed(false) // Désactiver l'autre filtre si on active celui-ci
+            }}
             style={{
               padding: '8px 16px',
               background: showOnlyMarked ? '#ffc107' : '#667eea',
@@ -293,10 +460,45 @@ export default function ReviewPage() {
             ⭐ {showOnlyMarked ? 'Toutes les questions' : 'Questions marquées'} ({markedCount})
           </button>
           <button
+            onClick={() => {
+              setShowOnlyFailed(!showOnlyFailed)
+              if (!showOnlyFailed) setShowOnlyMarked(false) // Désactiver l'autre filtre si on active celui-ci
+            }}
+            style={{
+              padding: '8px 16px',
+              background: showOnlyFailed ? '#dc3545' : '#ff6b6b',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              fontSize: '0.9em',
+              fontWeight: 'bold'
+            }}
+          >
+            ❌ {showOnlyFailed ? 'Toutes les questions' : 'Questions échouées'} ({failedCount})
+          </button>
+          <button
+            onClick={handleReturnToProgress}
+            style={{
+              padding: '8px 16px',
+              background: (showOnlyMarked || showOnlyFailed) ? '#28a745' : '#6c757d',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              fontSize: '0.9em',
+              fontWeight: 'bold',
+              opacity: (showOnlyMarked || showOnlyFailed) ? 1 : 0.6
+            }}
+            disabled={!showOnlyMarked && !showOnlyFailed}
+          >
+            📍 Revenir à la progression
+          </button>
+          <button
             onClick={handleClearProgress}
             style={{
               padding: '8px 16px',
-              background: '#dc3545',
+              background: '#6c757d',
               color: 'white',
               border: 'none',
               borderRadius: '8px',
@@ -458,7 +660,7 @@ export default function ReviewPage() {
           />
         </div>
 
-        {!isChecked && (
+        {(!isChecked || (isChecked && !isCorrect)) && (
           <button
             onClick={handleCheck}
             disabled={!userAnswer.trim()}
@@ -470,7 +672,7 @@ export default function ReviewPage() {
               cursor: userAnswer.trim() ? 'pointer' : 'not-allowed'
             }}
           >
-            ✓ 检查问题 (Vérifier la question)
+            {isChecked && !isCorrect ? '↻ 重新检查 (Revérifier)' : '✓ 检查问题 (Vérifier la question)'}
           </button>
         )}
 

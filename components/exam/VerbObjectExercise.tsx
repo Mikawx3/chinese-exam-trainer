@@ -1,6 +1,16 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
+
+// Fonction pour mélanger un tableau de manière aléatoire (algorithme Fisher-Yates)
+function shuffleArray<T>(array: T[]): T[] {
+  const shuffled = [...array]
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+  }
+  return shuffled
+}
 
 interface VerbObjectExerciseProps {
   verbs: Array<{ id: string; verb: string; pinyin: string }>
@@ -13,6 +23,10 @@ interface VerbObjectExerciseProps {
 }
 
 export default function VerbObjectExercise({ verbs, objects, correctPairs, onComplete, onPrevious, onNext, onReset }: VerbObjectExerciseProps) {
+  // Mélanger les verbes et objets de manière aléatoire
+  const shuffledVerbs = useMemo(() => shuffleArray(verbs), [verbs])
+  const shuffledObjects = useMemo(() => shuffleArray(objects), [objects])
+  
   const [selectedObjects, setSelectedObjects] = useState<Record<string, string>>({})
   const [usedObjects, setUsedObjects] = useState<Set<string>>(new Set())
   const [submitted, setSubmitted] = useState(false)
@@ -27,8 +41,8 @@ export default function VerbObjectExercise({ verbs, objects, correctPairs, onCom
   }
 
   const getExplanation = (verbId: string, objectId: string, isCorrect: boolean): string => {
-    const verb = verbs.find(v => v.id === verbId)
-    const object = objects.find(o => o.id === objectId)
+    const verb = shuffledVerbs.find(v => v.id === verbId)
+    const object = shuffledObjects.find(o => o.id === objectId)
     if (!verb || !object) return ''
     
     // Règles sémantiques pour les combinaisons verbe-objet courantes
@@ -124,14 +138,14 @@ export default function VerbObjectExercise({ verbs, objects, correctPairs, onCom
       
       <div style={{ marginBottom: '30px' }}>
         <h4 style={{ marginBottom: '15px', color: '#667eea' }}>Verbes :</h4>
-        {verbs.map((verb) => (
+        {shuffledVerbs.map((verb) => (
           <div key={verb.id} style={{ marginBottom: '15px', padding: '15px', background: '#f8f9fa', borderRadius: '8px' }}>
             <div style={{ fontWeight: 'bold', marginBottom: '10px' }}>
               <div className="chinese-text">{verb.verb}</div>
               <div style={{ color: '#666', marginTop: '5px', fontSize: '0.9em' }}>{verb.pinyin}</div>
             </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-              {objects.map((obj) => {
+              {shuffledObjects.map((obj) => {
                 const isSelected = selectedObjects[verb.id] === obj.id
                 const isUsed = usedObjects.has(obj.id) && !isSelected
                 const isCorrect = submitted && correctPairs.some(([v, o]) => v === verb.id && o === obj.id && obj.id === selectedObjects[verb.id])
@@ -197,7 +211,7 @@ export default function VerbObjectExercise({ verbs, objects, correctPairs, onCom
       {submitted && (
         <>
           <div className="score">
-            Score: {score} / {verbs.length}
+            Score: {score} / {shuffledVerbs.length}
           </div>
           <div style={{ display: 'flex', gap: '15px', justifyContent: 'center', marginTop: '20px', flexWrap: 'wrap' }}>
             {onPrevious && (

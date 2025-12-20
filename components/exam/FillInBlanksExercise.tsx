@@ -1,6 +1,16 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
+
+// Fonction pour mélanger un tableau de manière aléatoire (algorithme Fisher-Yates)
+function shuffleArray<T>(array: T[]): T[] {
+  const shuffled = [...array]
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+  }
+  return shuffled
+}
 
 interface FillInBlanksExerciseProps {
   sentences: Array<{
@@ -17,6 +27,10 @@ interface FillInBlanksExerciseProps {
 }
 
 export default function FillInBlanksExercise({ sentences, wordBank, onComplete, onPrevious, onNext, onReset }: FillInBlanksExerciseProps) {
+  // Mélanger les phrases et la banque de mots de manière aléatoire
+  const shuffledSentences = useMemo(() => shuffleArray(sentences), [sentences])
+  const shuffledWordBank = useMemo(() => shuffleArray(wordBank), [wordBank])
+  
   const [selectedWords, setSelectedWords] = useState<Record<string, string>>({})
   const [usedWords, setUsedWords] = useState<Set<string>>(new Set())
   const [submitted, setSubmitted] = useState(false)
@@ -32,8 +46,8 @@ export default function FillInBlanksExercise({ sentences, wordBank, onComplete, 
 
   const getExplanation = (sentence: { id: string; sentence: string; blanks: Array<{ position: number; correctAnswer: string }> }, selectedWordId: string | undefined, isCorrect: boolean): string => {
     const blank = sentence.blanks[0]
-    const selectedWord = wordBank.find(w => w.id === selectedWordId)
-    const correctWord = wordBank.find(w => w.word === blank.correctAnswer)
+    const selectedWord = shuffledWordBank.find(w => w.id === selectedWordId)
+    const correctWord = shuffledWordBank.find(w => w.word === blank.correctAnswer)
     
     // Règles grammaticales pour les mots courants
     const wordRules: Record<string, string> = {
@@ -110,11 +124,11 @@ export default function FillInBlanksExercise({ sentences, wordBank, onComplete, 
     let correct = 0
     let totalBlanks = 0
     
-    sentences.forEach((sentence) => {
+    shuffledSentences.forEach((sentence) => {
       sentence.blanks.forEach((blank) => {
         totalBlanks++
         const blankId = `${sentence.id}-${blank.position}`
-        const selectedWord = wordBank.find(w => w.id === selectedWords[blankId])
+        const selectedWord = shuffledWordBank.find(w => w.id === selectedWords[blankId])
         if (selectedWord && selectedWord.word === blank.correctAnswer) {
           correct++
         }
@@ -129,7 +143,7 @@ export default function FillInBlanksExercise({ sentences, wordBank, onComplete, 
   const renderSentence = (sentence: { id: string; sentence: string; pinyin?: string; blanks: Array<{ position: number; correctAnswer: string }> }) => {
     const parts = sentence.sentence.split('___')
     const blankId = `${sentence.id}-${sentence.blanks[0].position}`
-    const selectedWord = wordBank.find(w => w.id === selectedWords[blankId])
+    const selectedWord = shuffledWordBank.find(w => w.id === selectedWords[blankId])
     const isCorrect = submitted && selectedWord && selectedWord.word === sentence.blanks[0].correctAnswer
     const isIncorrect = submitted && selectedWord && !isCorrect
 
@@ -181,7 +195,7 @@ export default function FillInBlanksExercise({ sentences, wordBank, onComplete, 
           </div>
         )}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-          {wordBank.map((word) => {
+          {shuffledWordBank.map((word) => {
             const isSelected = selectedWords[blankId] === word.id
             const isUsed = usedWords.has(word.id) && !isSelected
             
@@ -219,7 +233,7 @@ export default function FillInBlanksExercise({ sentences, wordBank, onComplete, 
       <h3>五、选词填空 (Choisissez les mots pour remplir les blancs)</h3>
       <p style={{ marginBottom: '20px', color: '#666' }}>Chaque mot ne peut être utilisé qu'une seule fois</p>
       
-      {sentences.map(renderSentence)}
+      {shuffledSentences.map(renderSentence)}
 
       {!submitted && (
         <button className="btn btn-primary" onClick={handleSubmit}>
@@ -229,7 +243,7 @@ export default function FillInBlanksExercise({ sentences, wordBank, onComplete, 
       {submitted && (
         <>
           <div className="score">
-            Score: {score} / {sentences.reduce((sum, s) => sum + s.blanks.length, 0)}
+            Score: {score} / {shuffledSentences.reduce((sum, s) => sum + s.blanks.length, 0)}
           </div>
           <div style={{ display: 'flex', gap: '15px', justifyContent: 'center', marginTop: '20px', flexWrap: 'wrap' }}>
             {onPrevious && (
