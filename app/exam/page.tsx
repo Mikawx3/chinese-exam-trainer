@@ -11,6 +11,8 @@ import QuestionFormationExercise from '@/components/exam/QuestionFormationExerci
 import RearrangeExercise from '@/components/exam/RearrangeExercise'
 import DialogueExercise from '@/components/exam/DialogueExercise'
 import ReadingComprehensionExercise from '@/components/exam/ReadingComprehensionExercise'
+import ReviewQuestionsExercise from '@/components/exam/ReviewQuestionsExercise'
+import { reviewQuestions } from '@/data/reviewQuestions'
 
 export default function ExamPage() {
   const router = useRouter()
@@ -18,6 +20,7 @@ export default function ExamPage() {
   const [currentSection, setCurrentSection] = useState<string | null>(null)
   const [sectionScores, setSectionScores] = useState<Record<string, number>>({})
   const [sectionMaxScores, setSectionMaxScores] = useState<Record<string, number>>({})
+  const [showReviewQuestions, setShowReviewQuestions] = useState(false)
 
   const handleExamSelect = (exam: Exam) => {
     setSelectedExam(exam)
@@ -56,6 +59,27 @@ export default function ExamPage() {
     return { score: totalScore, max: totalMax }
   }
 
+  if (showReviewQuestions) {
+    return (
+      <div className="container">
+        <button className="btn btn-secondary back-button" onClick={() => setShowReviewQuestions(false)}>
+          ← Retour
+        </button>
+        <h1>复习问题 - 进修生期末复习1--12课</h1>
+        <p style={{ marginBottom: '30px', textAlign: 'center', color: '#666' }}>
+          93 questions de révision pour vous entraîner
+        </p>
+        <ReviewQuestionsExercise
+          questions={reviewQuestions}
+          onComplete={(score) => {
+            // Score tracking pour les questions de révision
+            console.log(`Score: ${score}/${reviewQuestions.length}`)
+          }}
+        />
+      </div>
+    )
+  }
+
   if (!selectedExam) {
     return (
       <div className="container">
@@ -66,6 +90,38 @@ export default function ExamPage() {
         <p style={{ marginBottom: '30px', textAlign: 'center', color: '#666' }}>
           Choisissez un examen pour commencer. Chaque examen contient les mêmes types de questions mais avec des contenus différents.
         </p>
+        <div style={{ marginBottom: '40px', textAlign: 'center' }}>
+          <div
+            className="exercise-card"
+            onClick={() => setShowReviewQuestions(true)}
+            style={{
+              maxWidth: '600px',
+              margin: '0 auto',
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              color: 'white',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-5px)'
+              e.currentTarget.style.boxShadow = '0 15px 40px rgba(102, 126, 234, 0.4)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)'
+              e.currentTarget.style.boxShadow = '0 4px 15px rgba(0,0,0,0.1)'
+            }}
+          >
+            <h3 style={{ color: 'white', fontSize: '1.8em', marginBottom: '10px' }}>
+              📚 复习问题 (Questions de révision)
+            </h3>
+            <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '1.1em' }}>
+              93 questions de révision - 进修生期末复习1--12课
+            </p>
+            <p style={{ color: 'rgba(255,255,255,0.8)', marginTop: '10px', fontSize: '0.95em' }}>
+              Entraînez-vous sur toutes les questions de révision
+            </p>
+          </div>
+        </div>
         <div className="exercise-grid">
           {exams.map((exam) => (
             <div
