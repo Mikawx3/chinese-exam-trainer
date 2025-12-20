@@ -53,16 +53,16 @@ export const reviewQuestions: ReviewQuestion[] = [
     number: 6,
     question: '你说汉语吗？',
     pinyin: 'nǐ shuō hànyǔ ma',
-    correctAnswer: '说。/ 不说。',
-    correctPinyin: 'shuō. / bù shuō.'
+    correctAnswer: '我说汉语。/ 我不说汉语。',
+    correctPinyin: 'wǒ shuō hànyǔ. / wǒ bù shuō hànyǔ.'
   },
   {
     id: 'q7',
     number: 7,
     question: '你学习英语吗？',
     pinyin: 'nǐ xuéxí yīngyǔ ma',
-    correctAnswer: '学习。/ 不学习。',
-    correctPinyin: 'xuéxí. / bù xuéxí.'
+    correctAnswer: '我学习英语。/ 我不学习英语。',
+    correctPinyin: 'wǒ xuéxí yīngyǔ. / wǒ bù xuéxí yīngyǔ.'
   },
   {
     id: 'q8',
@@ -93,8 +93,8 @@ export const reviewQuestions: ReviewQuestion[] = [
     number: 11,
     question: '你认识董老师吗？',
     pinyin: 'nǐ rènshí dǒng lǎoshī ma',
-    correctAnswer: '认识。/ 不认识。',
-    correctPinyin: 'rènshí. / bù rènshí.'
+    correctAnswer: '我认识董老师。/ 我不认识董老师。',
+    correctPinyin: 'wǒ rènshí dǒng lǎoshī. / wǒ bù rènshí dǒng lǎoshī.'
   },
   {
     id: 'q12',
@@ -365,16 +365,16 @@ export const reviewQuestions: ReviewQuestion[] = [
     number: 45,
     question: '星期六我们一起去三里屯玩儿，怎么样？',
     pinyin: 'xīngqīliù wǒmen yìqǐ qù sānlǐtún wánr, zěnmeyàng',
-    correctAnswer: '好。/ 好的。/ 可以。',
-    correctPinyin: 'hǎo. / hǎo de. / kěyǐ.'
+    correctAnswer: '好，星期六我们一起去三里屯玩儿。/ 好的，星期六我们一起去三里屯玩儿。',
+    correctPinyin: 'hǎo, xīngqīliù wǒmen yìqǐ qù sānlǐtún wánr. / hǎo de, xīngqīliù wǒmen yìqǐ qù sānlǐtún wánr.'
   },
   {
     id: 'q46',
     number: 46,
     question: '明天你有时间吗？',
     pinyin: 'míngtiān nǐ yǒu shíjiān ma',
-    correctAnswer: '有。/ 没有。',
-    correctPinyin: 'yǒu. / méiyǒu.'
+    correctAnswer: '有，我明天有时间。/ 没有，我明天没有时间。',
+    correctPinyin: 'yǒu, wǒ míngtiān yǒu shíjiān. / méiyǒu, wǒ míngtiān méiyǒu shíjiān.'
   },
   {
     id: 'q47',
@@ -485,16 +485,16 @@ export const reviewQuestions: ReviewQuestion[] = [
     number: 60,
     question: '昨天你忙吗？',
     pinyin: 'zuótiān nǐ máng ma',
-    correctAnswer: '忙。/ 不忙。',
-    correctPinyin: 'máng. / bù máng.'
+    correctAnswer: '忙，昨天我很忙。/ 不忙，昨天我不忙。',
+    correctPinyin: 'máng, zuótiān wǒ hěn máng. / bù máng, zuótiān wǒ bù máng.'
   },
   {
     id: 'q61',
     number: 61,
     question: '现在你困不困？（很）',
     pinyin: 'xiànzài nǐ kùn bù kùn (hěn)',
-    correctAnswer: '困。/ 不困。/ 很困。',
-    correctPinyin: 'kùn. / bù kùn. / hěn kùn.'
+    correctAnswer: '困，现在我很困。/ 不困，现在我不困。',
+    correctPinyin: 'kùn, xiànzài wǒ hěn kùn. / bù kùn, xiànzài wǒ bù kùn.'
   },
   {
     id: 'q62',
@@ -509,32 +509,32 @@ export const reviewQuestions: ReviewQuestion[] = [
     number: 63,
     question: '北京的人多不多？（非常）',
     pinyin: 'běijīng de rén duō bù duō (fēicháng)',
-    correctAnswer: '多。/ 不多。/ 非常多。',
-    correctPinyin: 'duō. / bù duō. / fēicháng duō.'
+    correctAnswer: '多，北京的人很多。/ 不多，北京的人不多。/ 非常多，北京的人非常多。',
+    correctPinyin: 'duō, běijīng de rén hěn duō. / bù duō, běijīng de rén bù duō. / fēicháng duō, běijīng de rén fēicháng duō.'
   },
   {
     id: 'q64',
     number: 64,
     question: '你去不去五道口玩儿？',
     pinyin: 'nǐ qù bù qù wǔdàokǒu wánr',
-    correctAnswer: '去。/ 不去。',
-    correctPinyin: 'qù. / bù qù.'
+    correctAnswer: '去，我去五道口玩儿。/ 不去，我不去五道口玩儿。',
+    correctPinyin: 'qù, wǒ qù wǔdàokǒu wánr. / bù qù, wǒ bù qù wǔdàokǒu wánr.'
   },
   {
     id: 'q65',
     number: 65,
     question: '你喝不喝茶？',
     pinyin: 'nǐ hē bù hē chá',
-    correctAnswer: '喝。/ 不喝。',
-    correctPinyin: 'hē. / bù hē.'
+    correctAnswer: '喝，我喝茶。/ 不喝，我不喝茶。',
+    correctPinyin: 'hē, wǒ hē chá. / bù hē, wǒ bù hē chá.'
   },
   {
     id: 'q66',
     number: 66,
     question: '你妈妈工作不工作？',
     pinyin: 'nǐ māma gōngzuò bù gōngzuò',
-    correctAnswer: '工作。/ 不工作。',
-    correctPinyin: 'gōngzuò. / bù gōngzuò.'
+    correctAnswer: '工作，我妈妈工作。/ 不工作，我妈妈不工作。',
+    correctPinyin: 'gōngzuò, wǒ māma gōngzuò. / bù gōngzuò, wǒ māma bù gōngzuò.'
   },
   {
     id: 'q67',
@@ -549,8 +549,8 @@ export const reviewQuestions: ReviewQuestion[] = [
     number: 68,
     question: '我看一下你的书，好吗？',
     pinyin: 'wǒ kàn yíxià nǐ de shū, hǎo ma',
-    correctAnswer: '好。/ 可以。/ 好的。',
-    correctPinyin: 'hǎo. / kěyǐ. / hǎo de.'
+    correctAnswer: '好，你可以看我的书。/ 可以，你可以看我的书。/ 好的，你可以看我的书。',
+    correctPinyin: 'hǎo, nǐ kěyǐ kàn wǒ de shū. / kěyǐ, nǐ kěyǐ kàn wǒ de shū. / hǎo de, nǐ kěyǐ kàn wǒ de shū.'
   },
   {
     id: 'q69',
@@ -573,8 +573,8 @@ export const reviewQuestions: ReviewQuestion[] = [
     number: 71,
     question: '北航这个学校大不大？',
     pinyin: 'běiháng zhège xuéxiào dà bù dà',
-    correctAnswer: '大。/ 不大。',
-    correctPinyin: 'dà. / bù dà.'
+    correctAnswer: '大，北航这个学校很大。/ 不大，北航这个学校不大。',
+    correctPinyin: 'dà, běiháng zhège xuéxiào hěn dà. / bù dà, běiháng zhège xuéxiào bù dà.'
   },
   {
     id: 'q72',
@@ -637,16 +637,16 @@ export const reviewQuestions: ReviewQuestion[] = [
     number: 79,
     question: '你喜欢听中国音乐吗？',
     pinyin: 'nǐ xǐhuan tīng zhōngguó yīnyuè ma',
-    correctAnswer: '喜欢。/ 不喜欢。',
-    correctPinyin: 'xǐhuan. / bù xǐhuan.'
+    correctAnswer: '喜欢，我喜欢听中国音乐。/ 不喜欢，我不喜欢听中国音乐。',
+    correctPinyin: 'xǐhuan, wǒ xǐhuan tīng zhōngguó yīnyuè. / bù xǐhuan, wǒ bù xǐhuan tīng zhōngguó yīnyuè.'
   },
   {
     id: 'q80',
     number: 80,
     question: '中国的咖啡好喝吗？',
     pinyin: 'zhōngguó de kāfēi hǎo hē ma',
-    correctAnswer: '好喝。/ 不好喝。',
-    correctPinyin: 'hǎo hē. / bù hǎo hē.'
+    correctAnswer: '好喝，中国的咖啡很好喝。/ 不好喝，中国的咖啡不好喝。',
+    correctPinyin: 'hǎo hē, zhōngguó de kāfēi hěn hǎo hē. / bù hǎo hē, zhōngguó de kāfēi bù hǎo hē.'
   },
   {
     id: 'q81',
@@ -677,8 +677,8 @@ export const reviewQuestions: ReviewQuestion[] = [
     number: 84,
     question: '跑步对身体好吗？',
     pinyin: 'pǎobù duì shēntǐ hǎo ma',
-    correctAnswer: '好。/ 不好。',
-    correctPinyin: 'hǎo. / bù hǎo.'
+    correctAnswer: '好，跑步对身体很好。/ 不好，跑步对身体不好。',
+    correctPinyin: 'hǎo, pǎobù duì shēntǐ hěn hǎo. / bù hǎo, pǎobù duì shēntǐ bù hǎo.'
   },
   {
     id: 'q85',
@@ -717,8 +717,8 @@ export const reviewQuestions: ReviewQuestion[] = [
     number: 89,
     question: '你的手机和老师的手机一样吗？',
     pinyin: 'nǐ de shǒujī hé lǎoshī de shǒujī yíyàng ma',
-    correctAnswer: '一样。/ 不一样。',
-    correctPinyin: 'yíyàng. / bù yíyàng.'
+    correctAnswer: '一样，我的手机和老师的手机一样。/ 不一样，我的手机和老师的手机不一样。',
+    correctPinyin: 'yíyàng, wǒ de shǒujī hé lǎoshī de shǒujī yíyàng. / bù yíyàng, wǒ de shǒujī hé lǎoshī de shǒujī bù yíyàng.'
   },
   {
     id: 'q90',
